@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docroid — Mobile Container & App Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="zoho-app-layout">
+    <!-- Zoho-Style Left Navigation Rail -->
+    <aside class="zoho-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <div class="logo-mark">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <div class="brand-info">
+            <span class="brand-name">Docroid</span>
+            <span class="brand-badge">Mobile Engine</span>
+          </div>
+        </div>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close Sidebar">&times;</button>
+      </div>
+
+      <div class="sidebar-status-banner">
+        <div class="live-pill">
+          <span class="pulse-dot"></span>
+          <span id="liveStatusText">Engine Online</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">WORKSPACE</div>
+        <a href="#applications" class="nav-item active" id="navApps">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Applications</span>
+          <span class="nav-badge" id="navAppsBadge">0</span>
+        </a>
+        <a href="#sites" class="nav-item" id="navSites">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Websites</span>
+          <span class="nav-badge" id="navSitesBadge">0</span>
+        </a>
+        <a href="#cluster" class="nav-item" id="navCluster">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><path d="M6 7l4 3.5m4 0l4-3.5M6 17l4-3.5m4 0l4 3.5"/></svg>
+          <span>Cluster & Pods</span>
+          <span class="nav-badge" id="navClusterBadge">0</span>
+        </a>
+        <a href="#networks" class="nav-item" id="navNetworks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Networks</span>
+          <span class="nav-badge" id="navNetworksBadge">0</span>
+        </a>
+        <a href="#compose" class="nav-item" id="navCompose">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span>Compose Stacks</span>
+        </a>
+        <a href="#secrets" class="nav-item" id="navSecrets">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          <span>Secrets Vault</span>
+        </a>
+        <a href="#packages" class="nav-item" id="navPackages">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>Packages & Bundles</span>
+        </a>
+
+        <div class="nav-section-title">DIAGNOSTICS & TOOLS</div>
+        <a href="#doctor" class="nav-item" id="navDoctor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>System Doctor</span>
+        </a>
+        <a href="#console" class="nav-item" id="navConsole">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span>Console & Logs</span>
+        </a>
+
+        <div class="nav-section-title">DOCUMENTATION</div>
+        <a href="#docs" class="nav-item" id="navDocs">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>Documentation</span>
+          <span class="nav-badge" style="background:var(--zoho-blue-light); color:var(--zoho-blue); font-weight:700;">GUIDE</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="node-card">
+          <div class="node-title">
+            <span class="node-indicator"></span>
+            <span>Termux Node</span>
+          </div>
+          <div class="node-detail">ARM64 Non-Rooted • v1.4</div>
+          <div class="node-meta">0% Idle Daemon Overhead</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Main Workspace -->
+    <div class="zoho-main">
+      <!-- Zoho Desk/CRM Top Navigation Bar -->
+      <header class="zoho-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="breadcrumbs">
+            <span class="breadcrumb-item">Docroid</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item active" id="breadcrumbActive">Applications Workspace</span>
+          </div>
+        </div>
+
+        <div class="topbar-center">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" placeholder="Search apps by name, ID, port, or command...">
+            <span class="search-shortcut">/</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- View Switcher (Cards vs Table) -->
+          <div class="view-switcher" role="group" aria-label="View Switcher">
+            <button class="view-btn active" id="viewModeCards" title="Cards Grid View">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </button>
+            <button class="view-btn" id="viewModeTable" title="High-Density Table View">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+          </div>
+
+          <button class="btn btn-icon" id="btnRefresh" title="Refresh Applications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </button>
+
+          <button class="btn btn-icon" id="btnThemeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+            <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
+          <button class="btn btn-secondary" id="btnSecretsModal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            <span>Secrets</span>
+          </button>
+
+          <button class="btn btn-secondary" id="btnDoctorModal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span>Doctor</span>
+          </button>
+
+          <button class="btn btn-secondary" id="btnImportModal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span>Images</span>
+          </button>
+
+          <button class="btn btn-primary" id="btnDeployModal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Deploy App</span>
+          </button>
+
+          <button class="btn btn-primary" id="btnDeploySiteTop" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            <span>Deploy Website</span>
+          </button>
+
+          <button class="btn btn-primary" id="btnDeployPodTop" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Deploy Pod</span>
+          </button>
+
+          <button class="btn btn-secondary" id="btnClusterSetupTop" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Cluster Setup</span>
+          </button>
+
+          <button class="btn btn-primary" id="btnCreateNetworkTop" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Create Network</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Content Area -->
+      <main class="zoho-content-scroll">
+        <!-- Applications Workspace View -->
+        <div id="sectionApps">
+          <!-- Zoho KPI Metric Strip -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Running Apps</span>
+                <span class="stat-badge-pill green">Active</span>
+              </div>
+              <div class="stat-value" id="statRunning">0</div>
+              <div class="stat-sub" id="statTotal">0 total registered</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Active CPU Load</span>
+                <span class="stat-badge-pill blue">Realtime</span>
+              </div>
+              <div class="stat-value" id="statCpu">0.0%</div>
+              <div class="stat-sub">Across all apps</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Memory In Use</span>
+                <span class="stat-badge-pill purple">RAM RSS</span>
+              </div>
+              <div class="stat-value" id="statMem">0 MB</div>
+              <div class="stat-sub">Total resident RAM</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Storage Engine</span>
+                <span class="stat-badge-pill amber">Zero-Idle</span>
+              </div>
+              <div class="stat-value" id="statStorage">Daemonless</div>
+              <div class="stat-sub">Battery optimized</div>
+            </div>
+          </section>
+
+          <!-- Mobile Dedicated Search Bar -->
+          <div class="mobile-search-bar" id="mobileSearchBar">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="mobileSearchInput" placeholder="Search apps by name, ID, port, or command...">
+            </div>
+          </div>
+
+          <!-- Filter & View Controls Bar -->
+          <section class="controls-bar">
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter="all">All (<span id="countAll">0</span>)</button>
+              <button class="filter-btn" data-filter="running">Running (<span id="countRunning">0</span>)</button>
+              <button class="filter-btn" data-filter="stopped">Stopped (<span id="countStopped">0</span>)</button>
+            </div>
+
+            <div class="controls-right">
+              <span class="badge" id="appsCountBadge">0 apps</span>
+            </div>
+          </section>
+
+          <!-- Applications Section -->
+          <section class="apps-section">
+            <!-- Cards View Mode -->
+            <div class="apps-grid" id="appsContainer">
+              <div class="loading-placeholder">
+                <div class="spinner"></div>
+                <p>Connecting to Docroid engine...</p>
+              </div>
+            </div>
+
+            <!-- Zoho Desk/CRM High-Density Table View Mode -->
+            <div class="apps-table-container" id="appsTableContainer" style="display: none;">
+              <table class="zoho-table">
+                <thead>
+                  <tr>
+                    <th style="width: 220px;">Application</th>
+                    <th style="width: 110px;">Status</th>
+                    <th style="width: 100px;">Engine</th>
+                    <th style="width: 140px;">Port Mapping</th>
+                    <th style="width: 90px;">CPU</th>
+                    <th style="width: 100px;">Memory</th>
+                    <th style="width: 120px;">Uptime</th>
+                    <th style="text-align: right; min-width: 220px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="appsTableBody">
+                  <!-- Rendered dynamically by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- Static Websites Workspace View -->
+        <div id="sectionSites" style="display: none;">
+          <!-- Websites KPI Metric Strip -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Hosted Websites</span>
+                <span class="stat-badge-pill green">Online</span>
+              </div>
+              <div class="stat-value" id="statSitesRunning">0</div>
+              <div class="stat-sub" id="statSitesTotal">0 total hosted</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Bound HTTP Ports</span>
+                <span class="stat-badge-pill blue">Port Forward</span>
+              </div>
+              <div class="stat-value" id="statSitesPorts">0</div>
+              <div class="stat-sub">Active listeners</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Virtual Domains</span>
+                <span class="stat-badge-pill purple">VHost Match</span>
+              </div>
+              <div class="stat-value" id="statSitesDomains">0</div>
+              <div class="stat-sub">Header routed hosts</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Web Storage</span>
+                <span class="stat-badge-pill amber">Zero-Daemon</span>
+              </div>
+              <div class="stat-value" id="statSitesStorage">0 KB</div>
+              <div class="stat-sub" id="statSitesFiles">0 files across sites</div>
+            </div>
+          </section>
+
+          <!-- Filter & View Controls Bar -->
+          <section class="controls-bar">
+            <div class="filter-group">
+              <button class="filter-btn active" id="btnSitesFilterAll" data-site-filter="all">All (<span id="countSitesAll">0</span>)</button>
+              <button class="filter-btn" id="btnSitesFilterRunning" data-site-filter="running">Running (<span id="countSitesRunning">0</span>)</button>
+              <button class="filter-btn" id="btnSitesFilterStopped" data-site-filter="stopped">Stopped (<span id="countSitesStopped">0</span>)</button>
+            </div>
+
+            <div class="controls-right" style="display:flex; gap:10px; align-items:center;">
+              <button class="btn btn-primary btn-sm" id="btnOpenDeploySiteModal">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <span>Deploy Website</span>
+              </button>
+              <span class="badge" id="sitesCountBadge">0 sites</span>
+            </div>
+          </section>
+
+          <!-- Websites Section -->
+          <section class="apps-section">
+            <!-- Cards View Mode -->
+            <div class="sites-grid" id="sitesContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+
+            <!-- Table View Mode -->
+            <div class="sites-table-container" id="sitesTableContainer" style="display: none;">
+              <table class="zoho-table">
+                <thead>
+                  <tr>
+                    <th style="width: 220px;">Website Name</th>
+                    <th style="width: 100px;">Status</th>
+                    <th style="width: 100px;">Port</th>
+                    <th style="width: 150px;">Domain (VHost)</th>
+                    <th style="width: 90px;">Files</th>
+                    <th style="width: 100px;">Size</th>
+                    <th style="width: 140px;">Access URL</th>
+                    <th style="text-align: right; min-width: 240px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sitesTableBody">
+                  <!-- Rendered dynamically by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- Cluster & Pods Workspace View -->
+        <div id="sectionCluster" style="display: none;">
+          <!-- Cluster Control Plane Header Banner -->
+          <section class="cluster-banner" id="clusterBanner">
+            <div class="cluster-banner-left">
+              <div class="cluster-badge-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><path d="M6 7l4 3.5m4 0l4-3.5M6 17l4-3.5m4 0l4 3.5"/></svg>
+              </div>
+              <div>
+                <div class="cluster-title-wrap">
+                  <h2 id="clusterBannerName">docroid-mesh</h2>
+                  <span class="cluster-role-pill control-plane" id="clusterRoleBadge">Control Plane</span>
+                  <span class="status-indicator online" id="clusterOnlineDot"></span>
+                </div>
+                <div class="cluster-subtitle" id="clusterBannerSubtitle">
+                  Leader: <code id="clusterLeaderAddr">127.0.0.1:9090</code> • <span id="clusterNodeSummary">1 Node Active</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="cluster-banner-right">
+              <div class="cluster-join-box" id="clusterJoinBox" style="display:none;">
+                <span class="join-label">Worker Join:</span>
+                <code class="join-cmd" id="clusterJoinCmd">docroid cluster join ...</code>
+                <button class="btn btn-sm btn-icon" id="btnCopyJoinCmd" title="Copy join command">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+              <button class="btn btn-sm btn-secondary" id="btnClusterSetupModal">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Setup</span>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" id="btnClusterLeave" style="display:none;">Leave</button>
+            </div>
+          </section>
+
+          <!-- KPI Metrics Strip -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Connected Devices</span>
+                <span class="stat-badge-pill green">Nodes</span>
+              </div>
+              <div class="stat-value" id="statClusterNodes">0 / 0</div>
+              <div class="stat-sub" id="statClusterNodesSub">0 Ready nodes</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Active Pods</span>
+                <span class="stat-badge-pill purple">Kubernetes</span>
+              </div>
+              <div class="stat-value" id="statClusterPods">0 / 0</div>
+              <div class="stat-sub" id="statClusterPodsSub">0 Pods running across cluster</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Desired Replicas</span>
+                <span class="stat-badge-pill blue">Scaling</span>
+              </div>
+              <div class="stat-value" id="statClusterReplicas">0</div>
+              <div class="stat-sub" id="statClusterReplicasSub">0 Deployments configured</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Cluster Compute</span>
+                <span class="stat-badge-pill amber">Capacity</span>
+              </div>
+              <div class="stat-value" id="statClusterCompute">0 Cores</div>
+              <div class="stat-sub" id="statClusterMemory">0 MB Aggregate Memory</div>
+            </div>
+          </section>
+
+          <!-- Section: Interconnected Device Nodes -->
+          <section class="cluster-section">
+            <div class="cluster-section-header">
+              <div class="section-title-wrap">
+                <h3>Interconnected Devices (Nodes)</h3>
+                <span class="badge" id="nodesCountBadge">0 Devices</span>
+              </div>
+              <div class="section-actions">
+                <button class="btn btn-sm btn-secondary" id="btnRefreshNodes">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Refresh Nodes</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="nodes-grid" id="clusterNodesGrid">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </section>
+
+          <!-- Section: Deployments & Scaling -->
+          <section class="cluster-section" style="margin-top: 1.5rem;">
+            <div class="cluster-section-header">
+              <div class="section-title-wrap">
+                <h3>Deployments & Scaling (Multi-Device Pods)</h3>
+                <span class="badge" id="deploymentsCountBadge">0 Services</span>
+              </div>
+              <div class="section-actions">
+                <button class="btn btn-sm btn-primary" id="btnOpenDeployPodModal">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>+ Deploy Service / Pod</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="deployments-grid" id="clusterDeploymentsContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </section>
+
+          <!-- Section: Pods Table -->
+          <section class="cluster-section" style="margin-top: 1.5rem;">
+            <div class="cluster-section-header">
+              <div class="section-title-wrap">
+                <h3>Cluster Pods</h3>
+                <span class="badge" id="podsCountBadge">0 Pods</span>
+              </div>
+              <div class="filter-group">
+                <button class="filter-btn active" id="btnPodsFilterAll" data-pod-filter="all">All (<span id="countPodsAll">0</span>)</button>
+                <button class="filter-btn" id="btnPodsFilterRunning" data-pod-filter="running">Running (<span id="countPodsRunning">0</span>)</button>
+                <button class="filter-btn" id="btnPodsFilterPending" data-pod-filter="pending">Pending (<span id="countPodsPending">0</span>)</button>
+                <button class="filter-btn" id="btnPodsFilterFailed" data-pod-filter="failed">Failed (<span id="countPodsFailed">0</span>)</button>
+              </div>
+            </div>
+
+            <div class="pods-table-container">
+              <table class="zoho-table">
+                <thead>
+                  <tr>
+                    <th style="width: 220px;">Pod Name / ID</th>
+                    <th style="width: 140px;">Deployment</th>
+                    <th style="width: 160px;">Assigned Device (Node)</th>
+                    <th style="width: 100px;">Status</th>
+                    <th style="width: 110px;">Port</th>
+                    <th style="width: 80px;">Restarts</th>
+                    <th style="width: 110px;">Age</th>
+                    <th style="text-align: right; min-width: 160px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="clusterPodsTableBody">
+                  <!-- Rendered dynamically by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- Networks Workspace View -->
+        <div id="sectionNetworks" style="display: none;">
+          <!-- KPI Metric Strip -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Virtual Networks</span>
+                <span class="stat-badge-pill green">Active</span>
+              </div>
+              <div class="stat-value" id="statNetworksCount">0</div>
+              <div class="stat-sub" id="statNetworksSub">Bridge & user networks</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Connected Containers</span>
+                <span class="stat-badge-pill blue">Intercom</span>
+              </div>
+              <div class="stat-value" id="statNetworkContainers">0</div>
+              <div class="stat-sub">Across all subnets</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Subnet Allocation</span>
+                <span class="stat-badge-pill purple">IPAM</span>
+              </div>
+              <div class="stat-value">10.89.0.0/16</div>
+              <div class="stat-sub">Virtual IP routing space</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Service Discovery</span>
+                <span class="stat-badge-pill amber">Zero-Root</span>
+              </div>
+              <div class="stat-value">/etc/hosts + Links</div>
+              <div class="stat-sub">Hostname & alias lookup</div>
+            </div>
+          </section>
+
+          <!-- Controls Bar -->
+          <section class="controls-bar">
+            <div class="filter-group">
+              <button class="filter-btn active" id="btnNetFilterAll" data-net-filter="all">All (<span id="countNetAll">0</span>)</button>
+              <button class="filter-btn" id="btnNetFilterBridge" data-net-filter="bridge">Bridge</button>
+              <button class="filter-btn" id="btnNetFilterHost" data-net-filter="host">Host</button>
+            </div>
+
+            <div class="controls-right" style="display:flex; gap:10px; align-items:center;">
+              <button class="btn btn-primary btn-sm" id="btnOpenCreateNetworkModal">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span>+ Create Network</span>
+              </button>
+              <span class="badge" id="networksCountBadge">0 networks</span>
+            </div>
+          </section>
+
+          <!-- Networks Grid -->
+          <section class="apps-section">
+            <div class="apps-grid" id="networksContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </section>
+        </div>
+
+        <!-- Comprehensive In-App Documentation Section -->
+        <div id="sectionDocs" style="display: none;">
+          <!-- Documentation Header -->
+          <div class="docs-header-banner">
+            <div class="docs-header-content">
+              <div class="docs-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>OFFICIAL MANUAL & REFERENCE</span>
+              </div>
+              <h2 class="docs-main-title">Docroid Operations & Developer Guide</h2>
+              <p class="docs-main-desc">Ultra-lightweight, zero-daemon container and application engine engineered for non-rooted Android (Termux) and edge environments.</p>
+              
+              <div class="docs-search-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="docsSearchInput" placeholder="Search documentation, CLI commands, APIs, flags...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Documentation Layout: Sticky TOC + Content Articles -->
+          <div class="docs-layout">
+            <!-- Sidebar Table of Contents -->
+            <aside class="docs-toc-card">
+              <div class="docs-toc-title">TABLE OF CONTENTS</div>
+              <nav class="docs-toc-nav" id="docsTocNav">
+                <a href="#doc-quickstart" class="docs-toc-link active" data-target="doc-quickstart">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+                  <span>Quickstart & Setup</span>
+                </a>
+                <a href="#doc-architecture" class="docs-toc-link" data-target="doc-architecture">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>
+                  <span>Architecture & Zero-Daemon</span>
+                </a>
+                <a href="#doc-cli" class="docs-toc-link" data-target="doc-cli">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span>
+                  <span>CLI Command Reference</span>
+                </a>
+                <a href="#doc-websites" class="docs-toc-link" data-target="doc-websites">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+                  <span>Static Website Hosting</span>
+                </a>
+                <a href="#doc-cluster" class="docs-toc-link" data-target="doc-cluster">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span>
+                  <span>Cluster & Pods Scaling</span>
+                </a>
+                <a href="#doc-networking" class="docs-toc-link" data-target="doc-networking">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></span>
+                  <span>Virtual Networking & Intercom</span>
+                </a>
+                <a href="#doc-compose" class="docs-toc-link" data-target="doc-compose">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+                  <span>Compose Stacks</span>
+                </a>
+                <a href="#doc-secrets" class="docs-toc-link" data-target="doc-secrets">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+                  <span>Secrets Vault & Bundles</span>
+                </a>
+                <a href="#doc-android" class="docs-toc-link" data-target="doc-android">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+                  <span>Android & Battery Tuning</span>
+                </a>
+                <a href="#doc-doctor" class="docs-toc-link" data-target="doc-doctor">
+                  <span class="toc-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+                  <span>System Doctor & Health</span>
+                </a>
+              </nav>
+
+              <div class="docs-quick-links">
+                <div class="docs-quick-title">USEFUL SHORTCUTS</div>
+                <div class="quick-link-pill" onclick="window.open('/api/apps', '_blank')">
+                  <span>REST API Endpoint</span>
+                  <code>/api/apps</code>
+                </div>
+                <div class="quick-link-pill" onclick="window.open('/api/networks', '_blank')">
+                  <span>Virtual Networks</span>
+                  <code>/api/networks</code>
+                </div>
+                <div class="quick-link-pill" onclick="window.open('/api/cluster/status', '_blank')">
+                  <span>Cluster Status</span>
+                  <code>/api/cluster</code>
+                </div>
+              </div>
+            </aside>
+
+            <!-- Main Documentation Body -->
+            <div class="docs-article-body" id="docsArticleBody">
+
+              <!-- Topic 1: Quickstart & Setup -->
+              <section class="docs-section-card" id="doc-quickstart">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">GETTING STARTED</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg> Quickstart & Installation</h3>
+                </div>
+                <p>Docroid is written in pure Go with zero external runtime dependencies. It runs completely non-rooted inside Android Termux or standard Linux environments.</p>
+
+                <div class="docs-callout note">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="callout-icon"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <div><strong>Zero-Daemon Guarantee:</strong> Unlike Docker which runs a persistent 300MB daemon in the background consuming battery, Docroid processes run natively or via lightweight sandboxes. When apps are stopped, 0% CPU and 0MB memory are consumed.</div>
+                </div>
+
+                <h4>Installation on Termux (Android)</h4>
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>BASH (TERMUX)</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code># 1. Download precompiled static binary
+curl -L -o $PREFIX/bin/docroid https://raw.githubusercontent.com/runerail/docroid/main/bin/docroid
+chmod +x $PREFIX/bin/docroid
+
+# 2. Verify environment with System Doctor
+docroid doctor
+
+# 3. Launch Web UI Dashboard
+docroid ui -p 9190</code></pre>
+                </div>
+
+                <h4>Deploy Your First Containerized App</h4>
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>TERMINAL</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code># Launch background web server with port mapping
+docroid run -d -n web-demo -p 8080:8080 python3 -m http.server 8080
+
+# Check running processes
+docroid ps
+
+# View real-time logs
+docroid logs web-demo -f
+
+# Stop and remove container
+docroid stop web-demo
+docroid rm web-demo</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 2: Architecture & Engines -->
+              <section class="docs-section-card" id="doc-architecture">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">INTERNALS</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg> Architecture & Execution Engines</h3>
+                </div>
+                <p>Standard Docker fails on mobile due to lack of kernel cgroups v2, missing <code>overlayfs</code>, and non-root limitations. Docroid bypasses these constraints using a dual-engine architecture:</p>
+
+                <div class="docs-grid-two">
+                  <div class="docs-engine-card">
+                    <div class="engine-badge native">NATIVE FAST-PATH</div>
+                    <h4>Native Fast-Path Engine</h4>
+                    <ul>
+                      <li><strong>0% CPU Loss:</strong> Executes Go binaries, static binaries, Node.js, and Python directly on Android kernel.</li>
+                      <li><strong>Workspace Sandboxing:</strong> Each app receives an isolated directory in <code>~/.docroid/workspaces/&lt;id&gt;</code>.</li>
+                      <li><strong>PGID Process Groups:</strong> Clean process hierarchy management prevents orphan zombie processes.</li>
+                    </ul>
+                  </div>
+
+                  <div class="docs-engine-card">
+                    <div class="engine-badge rootfs">ROOTFS SANDBOX</div>
+                    <h4>Rootfs Sandbox (PRoot / Alpine)</h4>
+                    <ul>
+                      <li><strong>Standard Linux FHS:</strong> Provides full <code>/bin/sh</code>, <code>/etc</code>, <code>/lib</code>, and package managers (<code>apk</code>).</li>
+                      <li><strong>Micro-Footprint:</strong> Utilizes an ultra-lean ~3.2MB Alpine micro-rootfs.</li>
+                      <li><strong>Fake Root (UID 0):</strong> Virtualizes root privileges without modifying the device system partition.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>RUNNING IN ROOTFS SANDBOX</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code>docroid run -d --rootfs alpine -n alpine-worker /bin/sh -c "while true; do date; sleep 5; done"</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 3: Complete CLI Command Reference -->
+              <section class="docs-section-card" id="doc-cli">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">CLI REFERENCE</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Complete Command Reference</h3>
+                </div>
+                <p>Docroid offers a Docker-compatible CLI experience optimized for shell usage and script automation.</p>
+
+                <div class="docs-table-wrap">
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Command</th>
+                        <th>Arguments & Flags</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code>docroid run</code></td>
+                        <td><code>-d, -n &lt;name&gt;, -p &lt;h:c&gt;, --rootfs, --network</code></td>
+                        <td>Run an application in background or foreground</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid ps</code></td>
+                        <td><code>-a (all), --json</code></td>
+                        <td>List active or all registered containers</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid stop</code></td>
+                        <td><code>&lt;id|name&gt;</code></td>
+                        <td>Send graceful SIGTERM (followed by SIGKILL)</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid start</code></td>
+                        <td><code>&lt;id|name&gt;</code></td>
+                        <td>Restart a previously stopped container</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid rm</code></td>
+                        <td><code>&lt;id|name&gt;, -f (force)</code></td>
+                        <td>Delete container metadata and state</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid logs</code></td>
+                        <td><code>&lt;id|name&gt;, -f (follow), -n &lt;lines&gt;</code></td>
+                        <td>Stream or display captured circular buffer logs</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid top</code></td>
+                        <td><code>&lt;id|name&gt;</code></td>
+                        <td>Display real-time CPU% and resident RAM (RSS)</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid exec</code></td>
+                        <td><code>[-it] [-d] [-e K=V] [-w dir] [-u user] &lt;id|name&gt; [cmd...]</code></td>
+                        <td>Execute command or interactive shell inside running container</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid ui</code></td>
+                        <td><code>-p &lt;port&gt; (default 9190)</code></td>
+                        <td>Start web dashboard & management server</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid network</code></td>
+                        <td><code>ls, create, inspect, connect, disconnect, rm</code></td>
+                        <td>Manage virtual container networks</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid cluster</code></td>
+                        <td><code>init, join, status, nodes, deploy, scale</code></td>
+                        <td>Manage multi-device cluster and pod mesh</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid sites</code></td>
+                        <td><code>ls, deploy, stop, rm, cert</code></td>
+                        <td>Manage static website hosting</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid secret</code></td>
+                        <td><code>set, get, ls, rm</code></td>
+                        <td>Manage encrypted vault secrets</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid bundle</code></td>
+                        <td><code>export, import, inspect</code></td>
+                        <td>Package apps into portable <code>.dpack</code> bundles</td>
+                      </tr>
+                      <tr>
+                        <td><code>docroid doctor</code></td>
+                        <td><code>--fix</code></td>
+                        <td>System health checks & Termux diagnostics</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <!-- Topic 4: Static Website Hosting -->
+              <section class="docs-section-card" id="doc-websites">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">HOSTING</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Static Website Hosting</h3>
+                </div>
+                <p>Deploy production-ready static websites, Single Page Applications (React, Vue, Vite, Next.js exports), and documentation directly from your phone.</p>
+
+                <h4>Features:</h4>
+                <ul>
+                  <li><strong>Virtual Host Multiplexing:</strong> Serve dozens of sites over standard HTTP port 80/8080 routed via the HTTP <code>Host:</code> header.</li>
+                  <li><strong>Dedicated Port Binding:</strong> Assign dedicated local ports for direct IP access (e.g. <code>http://192.168.1.100:9091</code>).</li>
+                  <li><strong>SPA Routing Fallback:</strong> Automatically serves <code>index.html</code> for non-file paths to support client-side routing.</li>
+                  <li><strong>Drag-and-Drop ZIP Upload:</strong> Instant extraction and deployment in the Web UI.</li>
+                </ul>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>CLI STATIC SITE DEPLOYMENT</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code># Deploy a directory with custom domain and port
+docroid sites deploy --name my-portfolio --dir ./dist --domain myapp.local --port 9091
+
+# List hosted static sites
+docroid sites ls</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 5: Cluster & Multi-Device Pods -->
+              <section class="docs-section-card" id="doc-cluster">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">DISTRIBUTED MESH</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg> Kubernetes-like Cluster & Pods</h3>
+                </div>
+                <p>Interconnect multiple Android devices, Raspberry Pis, and laptops into a distributed computing mesh with zero cloud dependencies.</p>
+
+                <h4>Clustering Capabilities:</h4>
+                <ul>
+                  <li><strong>Distributed Raft / Gossip Discovery:</strong> Autonomous peer interconnect over local Wi-Fi or hotspot.</li>
+                  <li><strong>Replica Scheduling:</strong> Automatically balances Pod replicas across available connected nodes.</li>
+                  <li><strong>Real-Time Live Scaling:</strong> Dynamically increase or decrease replica count on the fly from the Web UI or CLI.</li>
+                  <li><strong>Zero-Downtime Rolling Updates:</strong> Updates pods incrementally while maintaining service availability.</li>
+                </ul>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>INITIALIZE & SCALE CLUSTER</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code># Device 1 (Master / Control Plane):
+docroid cluster init --listen :9100
+
+# Device 2 (Worker Node - Phone B):
+docroid cluster join 192.168.1.50:9100 --token &lt;cluster-token&gt;
+
+# Deploy a multi-replica service across nodes:
+docroid cluster deploy --name api-service --replicas 4 --image python3 -p 8080:8080
+
+# Scale replicas dynamically:
+docroid cluster scale api-service --replicas 8</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 6: Virtual Networking & Inter-Container Discovery -->
+              <section class="docs-section-card" id="doc-networking">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">NETWORKING</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg> Virtual Networking & Inter-Container Intercom</h3>
+                </div>
+                <p>Docroid enables microservices and multi-container apps to communicate using service names and aliases without root privileges.</p>
+
+                <div class="docs-callout tip">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="callout-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <div><strong>Zero-Root Resolution Mechanism:</strong> PRoot rootfs sandboxes receive an isolated dynamic <code>/etc/hosts</code> mapping container names to <code>127.0.0.1</code>. Simultaneously, Docker link environment variables (e.g. <code>API_HOST</code>, <code>DB_PORT</code>) are injected into native and rootfs processes.</div>
+                </div>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>INTER-CONTAINER COMMUNICATION WORKFLOW</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code># 1. Create a virtual bridge network
+docroid network create microservices
+
+# 2. Run backend API attached to the network with alias
+docroid run -d -n backend --network microservices --network-alias api -p 9299:9299 python3 -m http.server 9299
+
+# 3. Run frontend client communicating directly via 'api:9299'
+docroid run -n frontend --network microservices python3 -c "import urllib.request; print(urllib.request.urlopen('http://api:9299').status)"</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 7: Compose Stacks -->
+              <section class="docs-section-card" id="doc-compose">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">ORCHESTRATION</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> Compose Stacks</h3>
+                </div>
+                <p>Define multi-container environments declaratively using standard <code>docroid-compose.yml</code> or <code>docker-compose.yml</code> formats.</p>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>SAMPLE DOCROID-COMPOSE.YML</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code>version: "3.8"
+services:
+  web:
+    image: native
+    command: python3 -m http.server 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    depends_on:
+      - db
+  db:
+    image: rootfs:alpine
+    command: sqlite3 /data/app.db
+    volumes:
+      - "./data:/data"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 8: Secrets Vault & Bundles -->
+              <section class="docs-section-card" id="doc-secrets">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">SECURITY</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Secrets Vault & Portable Bundles</h3>
+                </div>
+                <p>Keep sensitive tokens, passwords, and API keys safe using hardware-accelerated AES-GCM encryption.</p>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>MANAGING SECRETS & BUNDLES</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code># Store secret in encrypted vault
+docroid secret set DB_PASSWORD "s3cur3p@ss"
+
+# Run container with injected secret
+docroid run -d -n secure-worker --secret DB_PASSWORD ./worker
+
+# Export application and dependencies to portable .dpack bundle
+docroid bundle export web-demo -o web-demo.dpack
+
+# Import bundle on any other Android device
+docroid bundle import web-demo.dpack</code></pre>
+                </div>
+              </section>
+
+              <!-- Topic 9: Android & Battery Tuning -->
+              <section class="docs-section-card" id="doc-android">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">MOBILE TUNING</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> Android, Termux & Battery Optimization</h3>
+                </div>
+                <p>Android OS aggressively kills background processes to save battery. Follow these production best practices to ensure continuous 24/7 container operation:</p>
+
+                <ul>
+                  <li><strong>Acquire Wake Lock:</strong> Run <code>termux-wake-lock</code> in Termux to keep CPU alive when device screen is turned off.</li>
+                  <li><strong>Disable Battery Optimization:</strong> In Android Settings &rarr; Apps &rarr; Termux &rarr; Battery &rarr; Select <em>Unrestricted</em>.</li>
+                  <li><strong>Disable Phantom Process Killer (Android 12+):</strong> Android 12 introduced a 32-process limit. Disable it via ADB if running large clusters:
+                    <div class="docs-code-box" style="margin-top:8px;">
+                      <pre><code>adb shell "/system/bin/device_config put activity_manager max_phantom_processes 2147483647"</code></pre>
+                    </div>
+                  </li>
+                </ul>
+              </section>
+
+              <!-- Topic 10: System Doctor & FAQ -->
+              <section class="docs-section-card" id="doc-doctor">
+                <div class="docs-section-header">
+                  <span class="docs-section-badge">DIAGNOSTICS</span>
+                  <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> System Doctor & FAQ</h3>
+                </div>
+                <p>Run automated health diagnostics to check Termux permissions, PRoot binary integrity, storage quotas, and open ports.</p>
+
+                <div class="docs-code-box">
+                  <div class="docs-code-header">
+                    <span>SYSTEM DOCTOR CHECK</span>
+                    <button class="code-copy-btn" onclick="copyDocsCode(this)">Copy</button>
+                  </div>
+                  <pre><code>docroid doctor</code></pre>
+                </div>
+
+                <h4>Frequently Asked Questions</h4>
+                <div class="faq-item">
+                  <strong><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px; color:var(--zoho-blue);"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Q: Can I run Docker Hub images?</strong>
+                  <p>Yes, rootfs containers can unpack and run root filesystems extracted from Alpine, Ubuntu, or custom container images using PRoot.</p>
+                </div>
+                <div class="faq-item">
+                  <strong><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:6px; color:var(--zoho-blue);"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Q: Does Docroid require root?</strong>
+                  <p>No. 100% of Docroid features (networking, apps, static hosting, clustering) are designed to run non-rooted.</p>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Mobile Bottom Navigation Bar -->
+      <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Mobile Navigation">
+        <button class="bottom-nav-item active" data-view="apps" id="bnavApps">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Apps</span>
+        </button>
+        <button class="bottom-nav-item" data-view="sites" id="bnavSites">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Sites</span>
+        </button>
+        <button class="bottom-nav-item" data-view="cluster" id="bnavCluster">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Cluster</span>
+        </button>
+        <button class="bottom-nav-item" data-view="networks" id="bnavNetworks">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Networks</span>
+        </button>
+        <button class="bottom-nav-item" id="bnavMore">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          <span>More</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Deploy App Modal -->
+  <div class="modal-backdrop" id="deployModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 9V4s3.03.55 4 2c1.08 1.62 0 5 0 5"/></svg>
+          </div>
+          <div>
+            <h3>Deploy Application</h3>
+            <p class="modal-subtitle">Configure native binary, rootfs container, or compose stack</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeDeployModal">&times;</button>
+      </div>
+      <form id="deployForm">
+        <!-- Compose Toolbar (Upload & Auto-Parse, Download) -->
+        <div class="compose-toolbar" id="composeDropZone">
+          <div class="compose-toolbar-left">
+            <label class="btn btn-secondary btn-sm" for="composeFileInput" title="Upload docroid-compose.yml or docker-compose.yml to auto-fill form" style="cursor:pointer; margin:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>Upload Compose YAML</span>
+            </label>
+            <input type="file" id="composeFileInput" accept=".yml,.yaml" style="display:none;">
+            <div id="composeServiceGroup" style="display:none; align-items:center; gap:6px;">
+              <span style="font-size:11px; color:var(--text-muted);">Service:</span>
+              <select id="composeServiceSelect" style="padding:4px 8px; font-size:12px; border-radius:4px; width:auto;">
+              </select>
+            </div>
+          </div>
+          <div class="compose-toolbar-right">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnDownloadCompose" title="Export current form configurations as a docroid-compose.yml file">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              <span>Download Compose YAML</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="appName">Application Name</label>
+          <input type="text" id="appName" placeholder="e.g. web-server (leave blank to auto-generate)">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="appEngine">Execution Engine</label>
+            <select id="appEngine">
+              <option value="native" selected>Native Fast-Path (0% Overhead - Go / Binaries)</option>
+              <option value="rootfs">Rootfs Sandbox (PRoot / Alpine Linux)</option>
+            </select>
+          </div>
+          <div class="form-group" id="rootfsSelectGroup" style="display: none;">
+            <label for="appRootfs">Rootfs Environment</label>
+            <select id="appRootfs">
+              <option value="alpine" selected>alpine (Alpine 3.20 ~3MB)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="appCommand">Binary / Executable Command <span class="required">*</span></label>
+          <input type="text" id="appCommand" required placeholder="e.g. ./my-go-server or python3 or /bin/sh">
+        </div>
+
+        <div class="form-group">
+          <label for="appArgs">Arguments</label>
+          <input type="text" id="appArgs" placeholder="e.g. -m http.server 8080">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="appPort">Port Mapping (host:container or port)</label>
+            <input type="text" id="appPort" placeholder="e.g. 8080:3000 or 8080">
+          </div>
+          <div class="form-group">
+            <label for="appRestart">Restart Policy</label>
+            <select id="appRestart">
+              <option value="no" selected>no (no restart)</option>
+              <option value="always">always (auto-restart)</option>
+              <option value="on-failure">on-failure (restart on crash)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="appVolumes">Volume Bindings (host:container, comma separated)</label>
+            <input type="text" id="appVolumes" placeholder="e.g. /sdcard/data:/data, /tmp/db:/var/lib/db">
+          </div>
+          <div class="form-group">
+            <label for="appWorkDir">Working Directory</label>
+            <input type="text" id="appWorkDir" placeholder="Default: app isolated workspace">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="appEnv">Environment Variables (KEY=VALUE, comma separated)</label>
+          <input type="text" id="appEnv" placeholder="e.g. ENV=production,DEBUG=false">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="appNetwork">Virtual Network</label>
+            <select id="appNetwork">
+              <option value="bridge" selected>bridge (Default Virtual Network)</option>
+              <option value="host">host (Host Network)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="appNetworkAliases">Network Aliases (comma separated)</label>
+            <input type="text" id="appNetworkAliases" placeholder="e.g. web, api, frontend">
+          </div>
+        </div>
+
+        <div class="form-checkbox">
+          <input type="checkbox" id="appDetached" checked>
+          <label for="appDetached">Run as detached background service (Recommended)</label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelDeployModal">Cancel</button>
+          <button type="button" class="btn btn-secondary" id="btnDeployAllCompose" style="display:none; color:var(--accent-cyan); border-color:var(--accent-cyan);">
+            <span>Deploy All Services (Compose Up)</span>
+          </button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitDeploy">
+            <span>Launch App</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Zoho Desk-Style Slide-Over Detail Drawer -->
+  <div class="drawer-backdrop" id="logsDrawer">
+    <div class="drawer-content zoho-drawer">
+      <div class="drawer-header">
+        <div class="drawer-title-box">
+          <div class="drawer-identity">
+            <div class="drawer-title" id="logsAppName">App Details</div>
+            <div class="drawer-subtitle" id="logsAppId">ID: -</div>
+          </div>
+          <span class="status-badge" id="drawerStatusBadge">unknown</span>
+        </div>
+        <div class="drawer-actions">
+          <button class="modal-close" id="closeLogsDrawer">&times;</button>
+        </div>
+      </div>
+
+      <!-- Zoho Desk Tab Bar -->
+      <div class="drawer-tabs" role="tablist">
+        <button class="drawer-tab active" data-tab="logs" id="tabBtnLogs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span>Live Console</span>
+        </button>
+        <button class="drawer-tab" data-tab="overview" id="tabBtnOverview">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Specs & Stats</span>
+        </button>
+        <button class="drawer-tab" data-tab="config" id="tabBtnConfig">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <span>Config & Mounts</span>
+        </button>
+        <button class="drawer-tab" data-tab="actions" id="tabBtnActions">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Operations</span>
+        </button>
+      </div>
+
+      <!-- Tab Content 1: Live Console Logs -->
+      <div class="drawer-tab-panel active" id="panelLogs">
+        <div class="terminal-toolbar">
+          <label class="auto-scroll-toggle">
+            <input type="checkbox" id="autoScrollCheck" checked>
+            <span>Auto-scroll</span>
+          </label>
+          <div class="terminal-toolbar-right">
+            <button class="btn btn-sm btn-secondary" id="btnRefreshLogs">Refresh</button>
+          </div>
+        </div>
+        <div class="terminal-body" id="logsTerminal">
+          <div class="terminal-line text-muted">Waiting for log stream...</div>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Overview & Specs -->
+      <div class="drawer-tab-panel" id="panelOverview">
+        <div class="drawer-spec-grid" id="drawerOverviewContent">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Config & Mounts -->
+      <div class="drawer-tab-panel" id="panelConfig">
+        <div class="drawer-config-section" id="drawerConfigContent">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab Content 4: Operations & Rolling Update -->
+      <div class="drawer-tab-panel" id="panelActions">
+        <div class="drawer-actions-panel" id="drawerActionsContent">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Doctor Modal -->
+  <div class="modal-backdrop" id="doctorModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div>
+            <h3>System Diagnostics & Environment Doctor</h3>
+            <p class="modal-subtitle">Termux kernel, cgroups, PRoot, and battery health checks</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeDoctorModal">&times;</button>
+      </div>
+      <div class="doctor-content" id="doctorContent">
+        <div class="loading-placeholder">
+          <div class="spinner"></div>
+          <p>Running diagnostics...</p>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="btnRerunDoctor">Rerun Diagnostics</button>
+        <button type="button" class="btn btn-primary" id="closeDoctorBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Images & Registry Hub Modal -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <div>
+            <h3>Images & Registry</h3>
+            <p class="modal-subtitle">OCI Registry V2 • Docker Hub • GHCR • Docroid Builder</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeImportModal">&times;</button>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="modal-tabs" style="display:flex; gap:8px; border-bottom:1px solid var(--border-card); padding: 0 0 12px 0; margin-bottom:16px; overflow-x:auto;">
+        <button type="button" class="btn btn-sm btn-secondary img-modal-tab active" data-target="tabImagesList">Installed Images</button>
+        <button type="button" class="btn btn-sm btn-secondary img-modal-tab" data-target="tabImagePull">Pull Image</button>
+        <button type="button" class="btn btn-sm btn-secondary img-modal-tab" data-target="tabImageBuild">Build Image</button>
+        <button type="button" class="btn btn-sm btn-secondary img-modal-tab" data-target="tabImagePush">Push Image</button>
+        <button type="button" class="btn btn-sm btn-secondary img-modal-tab" data-target="tabImageImport">Import .dpack</button>
+      </div>
+
+      <!-- Tab 1: Installed Images List -->
+      <div id="tabImagesList" class="img-tab-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:13px; color:var(--text-secondary);">Locally stored images and portable bundles (~/.docroid/images/)</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshImages">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-card); text-align: left; color: var(--text-secondary);">
+                <th style="padding: 8px 12px;">REPOSITORY</th>
+                <th style="padding: 8px 12px;">TAG</th>
+                <th style="padding: 8px 12px;">ENGINE</th>
+                <th style="padding: 8px 12px;">ARCH</th>
+                <th style="padding: 8px 12px; text-align: right;">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="imagesTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 2: Pull Image -->
+      <div id="tabImagePull" class="img-tab-panel" style="display:none;">
+        <form id="pullImageForm">
+          <div class="form-group">
+            <label for="pullImageRef">Image Reference or URL <span class="required">*</span></label>
+            <input type="text" id="pullImageRef" placeholder="e.g. alpine:latest, ghcr.io/owner/repo:tag, or https://.../bundle.dpack" required style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary); font-family:var(--font-mono); font-size:13px;">
+          </div>
+          <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;">
+            <span style="font-size:12px; color:var(--text-secondary);">Presets:</span>
+            <button type="button" class="btn btn-secondary btn-xs preset-pull-btn" data-ref="alpine:latest">alpine:latest</button>
+            <button type="button" class="btn btn-secondary btn-xs preset-pull-btn" data-ref="busybox:latest">busybox:latest</button>
+            <button type="button" class="btn btn-secondary btn-xs preset-pull-btn" data-ref="python:3.11-alpine">python:3.11-alpine</button>
+            <button type="button" class="btn btn-secondary btn-xs preset-pull-btn" data-ref="node:20-alpine">node:20-alpine</button>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnSubmitPull">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Pull Image</span>
+          </button>
+        </form>
+        <div id="pullLogsContainer" style="display:none; margin-top:16px;">
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Pull Progress & Digest:</div>
+          <pre id="pullLogs" style="background:#090d16; color:#10b981; border:1px solid var(--border-card); padding:12px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:12px; max-height:200px; overflow-y:auto; white-space:pre-wrap;"></pre>
+        </div>
+      </div>
+
+      <!-- Tab 3: Build Image -->
+      <div id="tabImageBuild" class="img-tab-panel" style="display:none;">
+        <form id="buildImageForm">
+          <div class="form-group">
+            <label for="buildImageTag">Image Tag <span class="required">*</span></label>
+            <input type="text" id="buildImageTag" placeholder="e.g. myapp:1.0" required style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary); font-family:var(--font-mono); font-size:13px;">
+          </div>
+          <div class="form-group">
+            <label for="buildDockerfile">Dockerfile / Docroidfile Definition <span class="required">*</span></label>
+            <textarea id="buildDockerfile" rows="7" required style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary); font-family:var(--font-mono); font-size:12px; resize:vertical; line-height:1.5;">FROM alpine:latest
+WORKDIR /app
+RUN echo "Hello from Docroid Builder!" > greeting.txt
+CMD cat /app/greeting.txt</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnSubmitBuild">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <span>Build Image</span>
+          </button>
+        </form>
+        <div id="buildLogsContainer" style="display:none; margin-top:16px;">
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Build Output:</div>
+          <pre id="buildLogs" style="background:#090d16; color:#06b6d4; border:1px solid var(--border-card); padding:12px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:12px; max-height:200px; overflow-y:auto; white-space:pre-wrap;"></pre>
+        </div>
+      </div>
+
+      <!-- Tab 4: Push Image -->
+      <div id="tabImagePush" class="img-tab-panel" style="display:none;">
+        <form id="pushImageForm">
+          <div class="form-group">
+            <label for="pushImageRef">Target Registry & Tag <span class="required">*</span></label>
+            <input type="text" id="pushImageRef" placeholder="e.g. myorg/myapp:1.0 or localhost:5000/myapp:latest" required style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary); font-family:var(--font-mono); font-size:13px;">
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+            Uploads layer blobs and an OCI Image Manifest to the target registry using the OCI V2 distribution specification.
+          </p>
+          <button type="submit" class="btn btn-primary" id="btnSubmitPush">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Push Image</span>
+          </button>
+        </form>
+        <div id="pushLogsContainer" style="display:none; margin-top:16px;">
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Push Output:</div>
+          <pre id="pushLogs" style="background:#090d16; color:#a855f7; border:1px solid var(--border-card); padding:12px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:12px; max-height:200px; overflow-y:auto; white-space:pre-wrap;"></pre>
+        </div>
+      </div>
+
+      <!-- Tab 5: Import .dpack -->
+      <div id="tabImageImport" class="img-tab-panel" style="display:none;">
+        <form id="importForm">
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+            Select a <code>.dpack</code> bundle exported from Docroid to install and register it into your local repository.
+          </p>
+          <div class="form-group">
+            <label for="bundleFile">Bundle Archive (.dpack) <span class="required">*</span></label>
+            <input type="file" id="bundleFile" accept=".dpack,.tar.gz,.tgz" required style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary);">
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnSubmitImport">
+            <span>Import Package</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px;">
+        <button type="button" class="btn btn-secondary" id="cancelImportModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secrets & Key-Values Modal -->
+  <div class="modal-backdrop" id="secretsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </div>
+          <div>
+            <h3>Secure Key-Values & Secrets Store</h3>
+            <p class="modal-subtitle">Persisted with 0600 permissions in ~/.docroid/secrets/</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeSecretsModal">&times;</button>
+      </div>
+      <div class="secrets-content" style="padding: 16px 0;">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Encrypted and owner-restricted key-values injected into applications at launch or on demand.
+        </p>
+        
+        <!-- Add Secret Form -->
+        <form id="addSecretForm" style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <input type="text" id="newSecretKey" placeholder="KEY_NAME (e.g. DB_PASS)" required style="flex:1; padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary); font-family:var(--font-mono); font-size:13px;">
+          <input type="password" id="newSecretVal" placeholder="Secret Value" required style="flex:1; padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-card); border-radius:var(--radius-md); color:var(--text-primary); font-family:var(--font-mono); font-size:13px;">
+          <button type="submit" class="btn btn-primary btn-sm">Store Secret</button>
+        </form>
+
+        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-card); text-align: left; color: var(--text-secondary);">
+                <th style="padding: 8px 12px;">KEY</th>
+                <th style="padding: 8px 12px;">VALUE</th>
+                <th style="padding: 8px 12px; text-align: right;">ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="secretsTableBody">
+              <!-- Rendered dynamically by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="closeSecretsBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zero-Downtime Update Modal -->
+  <div class="modal-backdrop" id="updateModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div>
+            <h3>Zero-Downtime Live Update</h3>
+            <p class="modal-subtitle">Shadow socket handover with seamless cutover</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeUpdateModal">&times;</button>
+      </div>
+      <form id="updateForm">
+        <input type="hidden" id="updateAppId">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Updating application <strong id="updateAppNameDisplay" style="color:var(--accent-blue);"></strong> with shadow cutover. Incoming requests will not be dropped.
+        </p>
+
+        <div class="form-group">
+          <label for="updateCommand">Binary / Executable Command</label>
+          <input type="text" id="updateCommand" placeholder="e.g. ./my-server-v2">
+        </div>
+
+        <div class="form-group">
+          <label for="updateArgs">Arguments</label>
+          <input type="text" id="updateArgs" placeholder="e.g. --port 8080 --mode production">
+        </div>
+
+        <div class="form-group">
+          <label for="updateEnv">Environment Variables (KEY=VALUE, comma separated)</label>
+          <input type="text" id="updateEnv" placeholder="e.g. APP_ENV=production,RELEASE=2.0">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="updateDrain">Connection Drain Window (s)</label>
+            <input type="number" id="updateDrain" min="0.5" max="30" step="0.5" value="1.5">
+          </div>
+          <div class="form-group">
+            <label for="updateTimeout">Readiness Probe Timeout (s)</label>
+            <input type="number" id="updateTimeout" min="2" max="60" step="1" value="10">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelUpdateModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitUpdate">
+            <span>Execute Live Cutover</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Deploy Static Website Modal -->
+  <div class="modal-backdrop" id="deploySiteModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div>
+            <h3>Deploy Static Website</h3>
+            <p class="modal-subtitle">Upload HTML/assets or ZIP bundle with custom port & domain routing</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeDeploySiteModal">&times;</button>
+      </div>
+
+      <form id="deploySiteForm">
+        <!-- Upload Mode Selector Tabs -->
+        <div class="site-tabs" role="tablist">
+          <button type="button" class="site-tab-btn active" id="tabSiteZip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span>Upload ZIP Bundle</span>
+          </button>
+          <button type="button" class="site-tab-btn" id="tabSiteFiles">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Upload HTML &amp; Assets</span>
+          </button>
+          <button type="button" class="site-tab-btn" id="tabSiteHtml">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Direct HTML Editor</span>
+          </button>
+        </div>
+
+        <!-- Tab 1: ZIP Bundle Dropzone -->
+        <div class="site-tab-pane active" id="paneSiteZip">
+          <div class="dropzone-box" id="siteZipDropzone">
+            <input type="file" id="inputSiteZip" accept=".zip,application/zip" style="display:none;">
+            <div class="dropzone-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="dropzone-title">Drag & drop your website <strong>.zip</strong> bundle here</div>
+            <div class="dropzone-sub">or click to browse from device. Automatically detects index.html inside dist/, build/, or root.</div>
+            <div class="file-picked-chip" id="zipFileChip" style="display:none;">
+              <span id="zipFileName"></span>
+              <span class="chip-remove" id="btnRemoveZip">&times;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Multi-file / Folder Upload -->
+        <div class="site-tab-pane" id="paneSiteFiles">
+          <div class="dropzone-box" id="siteFilesDropzone">
+            <input type="file" id="inputSiteFiles" multiple style="display:none;">
+            <input type="file" id="inputSiteFolder" webkitdirectory directory multiple style="display:none;">
+            <div class="dropzone-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="dropzone-title">Upload static HTML, CSS, JS, images, or entire directories</div>
+            <div class="dropzone-actions" style="margin-top: 10px; display:flex; gap:10px; justify-content:center;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnPickFiles">Pick Static Files</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnPickFolder">Pick Entire Folder</button>
+            </div>
+            <div class="files-picked-summary" id="filesPickedSummary" style="display:none; margin-top:12px; font-size:12px; color:var(--accent-emerald);">
+              <span id="filesPickedCount">0</span> files staged for upload.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Direct HTML Code Editor -->
+        <div class="site-tab-pane" id="paneSiteHtml">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="inputSiteHtmlCode">index.html Content</label>
+            <textarea id="inputSiteHtmlCode" rows="8" class="code-editor-box" placeholder="<!DOCTYPE html>..."><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Static Site</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; text-align: center; padding: 4rem 1rem; }
+    h1 { color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <h1>Hello from Docroid!</h1>
+  <p>Static website served natively with zero daemon battery drain.</p>
+</body>
+</html></textarea>
+          </div>
+        </div>
+
+        <!-- Configuration Settings -->
+        <div class="site-config-grid" style="margin-top: 1.25rem;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="siteName">Website Name *</label>
+              <input type="text" id="siteName" placeholder="e.g. portfolio (lowercase, alphanumeric)" required>
+            </div>
+            <div class="form-group">
+              <label for="sitePort">Port Binding *</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="number" id="sitePort" value="8080" min="1" max="65535" required>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnSuggestPort" title="Suggest an available port" style="display:inline-flex; align-items:center; gap:5px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Auto</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="siteDomain">Domain / Virtual Host (Optional)</label>
+            <input type="text" id="siteDomain" placeholder="e.g. mysite.local or leave empty for all (*)">
+            <span class="form-hint">Supports Virtual Host header routing. Multiple sites can share a port if domains differ.</span>
+          </div>
+
+          <div class="form-row options-row">
+            <label class="checkbox-label" title="Route all non-existent paths to index.html (useful for React/Vue/Angular SPAs)">
+              <input type="checkbox" id="siteSpaMode">
+              <span>SPA Fallback Routing (Single Page Apps)</span>
+            </label>
+            <label class="checkbox-label" title="Render styled directory tree when index.html is absent">
+              <input type="checkbox" id="siteDirListing">
+              <span>Directory Browsing</span>
+            </label>
+            <label class="checkbox-label" title="Immediately launch HTTP server on the configured port">
+              <input type="checkbox" id="siteAutoStart" checked>
+              <span>Auto-Start Server</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelDeploySiteModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitDeploySite" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Deploy &amp; Host Website</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Site File Explorer Modal -->
+  <div class="modal-backdrop" id="siteFilesModal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <h3 id="explorerSiteTitle">Website Files</h3>
+            <p class="modal-subtitle" id="explorerSiteMeta">Browse file tree, view file contents, and download assets</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeSiteFilesModal">&times;</button>
+      </div>
+
+      <div class="explorer-body">
+        <!-- Left: File Tree -->
+        <div class="explorer-tree-pane">
+          <div class="explorer-pane-header">
+            <span>PUBLIC ROOT FILES</span>
+            <span id="explorerFileCountBadge" class="badge">0 items</span>
+          </div>
+          <div class="explorer-file-list" id="explorerFileList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Right: File Preview Pane -->
+        <div class="explorer-preview-pane">
+          <div class="explorer-preview-header">
+            <span id="explorerSelectedFileName">No file selected</span>
+            <div class="explorer-preview-actions" id="explorerPreviewActions" style="display:none;">
+              <span id="explorerFileSizeBadge" class="badge">0 B</span>
+            </div>
+          </div>
+          <div class="explorer-preview-content" id="explorerPreviewContent">
+            <div class="empty-preview-msg">Select a file from the list to preview its contents</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="justify-content: space-between;">
+        <div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnExportSiteZip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Download .zip</span>
+          </button>
+        </div>
+        <button type="button" class="btn btn-secondary" id="closeSiteFilesModalBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Update Assets Modal -->
+  <div class="modal-backdrop" id="siteUpdateModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </div>
+          <div>
+            <h3>Update Website Assets</h3>
+            <p class="modal-subtitle" id="updateSiteSubtitle">Deploy new files or ZIP bundle to <span id="updateSiteTarget"></span></p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeSiteUpdateModal">&times;</button>
+      </div>
+      <form id="siteUpdateForm">
+        <input type="hidden" id="updateSiteID">
+        <div class="dropzone-box" id="updateDropzone">
+          <input type="file" id="inputUpdateZip" accept=".zip,application/zip" style="display:none;">
+          <div class="dropzone-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          </div>
+          <div class="dropzone-title">Select new <strong>.zip</strong> bundle to replace site files</div>
+          <div class="dropzone-sub">Click to browse or drag & drop</div>
+          <div class="file-picked-chip" id="updateZipChip" style="display:none;">
+            <span id="updateZipName"></span>
+          </div>
+        </div>
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelSiteUpdateModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitSiteUpdate">Upload & Redeploy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Deploy Pod / Service Modal -->
+  <div class="modal-backdrop" id="deployPodModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+          <div>
+            <h3>Deploy Scalable Pod / Service</h3>
+            <p class="modal-subtitle">Distribute containerized workloads across interconnected devices</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeDeployPodModal">&times;</button>
+      </div>
+      <form id="deployPodForm">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="inputPodName">Service / Pod Name</label>
+            <input type="text" id="inputPodName" placeholder="e.g. web-api (auto-generated if blank)">
+          </div>
+          <div class="form-group flex-1">
+            <label for="inputPodReplicas">Desired Replicas (Devices Scaling)</label>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <input type="number" id="inputPodReplicas" min="1" max="20" value="2" style="width: 80px;">
+              <input type="range" id="sliderPodReplicas" min="1" max="20" value="2" style="flex: 1;">
+              <span class="badge" id="badgePodReplicasPreview">2 Replicas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputPodCommand">Execution Command <span class="required">*</span></label>
+          <input type="text" id="inputPodCommand" placeholder="e.g. python3 -m http.server 8000" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="inputPodPort">Container / App Port</label>
+            <input type="number" id="inputPodPort" placeholder="e.g. 8000">
+          </div>
+          <div class="form-group flex-1">
+            <label for="inputPodServicePort">Cluster Service Port (Load Balancer)</label>
+            <input type="number" id="inputPodServicePort" placeholder="e.g. 8080 (optional cluster proxy)">
+            <small class="form-hint">Round-robins incoming traffic to all replicas across devices</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="selectPodEngine">Engine Environment</label>
+            <select id="selectPodEngine">
+              <option value="native">Native Mobile Process (Termux / Linux / macOS)</option>
+              <option value="rootfs">Rootfs Sandbox (Alpine Linux)</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="inputPodSelector">Node Affinity / Selector (Optional)</label>
+            <input type="text" id="inputPodSelector" placeholder="e.g. os=android or arch=arm64">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputPodEnv">Environment Variables (KEY=VAL per line)</label>
+          <textarea id="inputPodEnv" rows="3" placeholder="PORT=8000&#10;NODE_ENV=production"></textarea>
+        </div>
+
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelDeployPodModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitDeployPod">Deploy Replicas to Cluster</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Cluster Setup Modal (Init or Join) -->
+  <div class="modal-backdrop" id="clusterSetupModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><path d="M6 7l4 3.5m4 0l4-3.5M6 17l4-3.5m4 0l4 3.5"/></svg>
+          </div>
+          <div>
+            <h3>Cluster Mesh Setup</h3>
+            <p class="modal-subtitle">Interconnect devices or establish a new Control Plane</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeClusterSetupModal">&times;</button>
+      </div>
+
+      <div class="site-tabs" style="margin-bottom: 1.25rem;">
+        <button type="button" class="site-tab-btn active" id="tabClusterInit">Initialize New Cluster</button>
+        <button type="button" class="site-tab-btn" id="tabClusterJoin">Join Existing Cluster</button>
+      </div>
+
+      <!-- Pane: Init Cluster -->
+      <form id="clusterInitForm">
+        <div class="form-group">
+          <label for="inputClusterName">Cluster Mesh Name</label>
+          <input type="text" id="inputClusterName" value="docroid-mesh" required>
+        </div>
+        <div class="form-group">
+          <label for="inputClusterPort">Dashboard & API Port</label>
+          <input type="number" id="inputClusterPort" value="9090" required>
+        </div>
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelClusterInit">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitClusterInit">Initialize Control Plane</button>
+        </div>
+      </form>
+
+      <!-- Pane: Join Cluster -->
+      <form id="clusterJoinForm" style="display:none;">
+        <div class="form-group">
+          <label for="inputJoinLeaderAddr">Leader Node URL <span class="required">*</span></label>
+          <input type="text" id="inputJoinLeaderAddr" placeholder="e.g. http://192.168.1.100:9090" required>
+        </div>
+        <div class="form-group">
+          <label for="inputJoinToken">Cluster Join Token <span class="required">*</span></label>
+          <input type="text" id="inputJoinToken" placeholder="dcr-tok-..." required>
+        </div>
+        <div class="form-group">
+          <label for="inputJoinNodeName">Custom Device Name</label>
+          <input type="text" id="inputJoinNodeName" placeholder="e.g. Pixel-7-Termux">
+        </div>
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelClusterJoin">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitClusterJoin">Connect & Join Cluster</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pod Logs Viewer Modal -->
+  <div class="modal-backdrop" id="podLogsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div>
+            <h3>Pod Runtime Logs</h3>
+            <p class="modal-subtitle" id="podLogsSubtitle">Viewing logs for pod</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closePodLogsModal">&times;</button>
+      </div>
+      <div class="logs-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <label style="font-size:12px; color:var(--text-secondary);">Lines:</label>
+          <select id="selectPodLogLines" style="font-size:12px; padding:4px 8px;">
+            <option value="50">50 lines</option>
+            <option value="100" selected>100 lines</option>
+            <option value="250">250 lines</option>
+            <option value="500">500 lines</option>
+          </select>
+        </div>
+        <button class="btn btn-sm btn-secondary" id="btnRefreshPodLogs">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+      <pre class="logs-pre" id="podLogsContent" style="background:#0f172a; color:#f8fafc; padding:12px; border-radius:8px; max-height:400px; overflow:auto; font-size:12px; font-family:monospace;">Loading pod logs...</pre>
+      <div class="modal-actions" style="margin-top:1rem;">
+        <button type="button" class="btn btn-secondary" id="closePodLogsBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Network Modal -->
+  <div class="modal-backdrop" id="createNetworkModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          <div>
+            <h3>Create Virtual Network</h3>
+            <p class="modal-subtitle">Docker-like isolated container network with automatic DNS &amp; service discovery</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeCreateNetworkModal">&times;</button>
+      </div>
+      <form id="createNetworkForm">
+        <div class="form-group">
+          <label for="inputNetworkName">Network Name <span class="required">*</span></label>
+          <input type="text" id="inputNetworkName" placeholder="e.g. app-network (lowercase, alphanumeric)" required>
+        </div>
+        <div class="form-group">
+          <label for="selectNetworkDriver">Driver</label>
+          <select id="selectNetworkDriver">
+            <option value="bridge" selected>bridge (Isolated virtual subnet with /etc/hosts resolution)</option>
+            <option value="host">host (Direct host networking)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="inputNetworkSubnet">Subnet CIDR (Optional)</label>
+          <input type="text" id="inputNetworkSubnet" placeholder="e.g. 10.90.0.0/16 (auto-allocated if blank)">
+        </div>
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelCreateNetworkModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitCreateNetwork">Create Network</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Connect Container Modal -->
+  <div class="modal-backdrop" id="connectContainerModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          <div>
+            <h3>Connect Container to Network</h3>
+            <p class="modal-subtitle">Enable inter-container discovery by name and network aliases</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeConnectContainerModal">&times;</button>
+      </div>
+      <form id="connectContainerForm">
+        <input type="hidden" id="connectTargetNetworkID">
+        <div class="form-group">
+          <label for="selectConnectContainer">Select Container / Application <span class="required">*</span></label>
+          <select id="selectConnectContainer" required>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="inputConnectAliases">Network Aliases (Optional, comma-separated)</label>
+          <input type="text" id="inputConnectAliases" placeholder="e.g. db, database, postgres">
+          <small class="form-hint">Other containers on this network will be able to reach this container using these hostnames.</small>
+        </div>
+        <div class="modal-actions" style="margin-top:1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelConnectContainerModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitConnectContainer">Connect</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

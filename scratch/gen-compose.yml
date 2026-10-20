@@ -1,0 +1,17 @@
+version: "1.0"
+services:
+    compose-web:
+        name: compose-web
+        engine: native
+        command: python3
+        args:
+            - -m
+            - http.server
+            - "55415"
+        ports:
+            - 19081:55415
+        environment:
+            PORT: "19081"
+            SERVICE: web-frontend
+        restart: always
+        detached: true

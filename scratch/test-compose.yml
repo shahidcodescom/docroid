@@ -1,0 +1,23 @@
+version: "1.0"
+services:
+  web:
+    name: compose-web
+    engine: native
+    command: python3 -m http.server 19081
+    ports:
+      - "19081:19081"
+    restart: always
+    environment:
+      SERVICE: web-frontend
+      PORT: "19081"
+
+  api:
+    name: compose-api
+    engine: native
+    command: python3 -m http.server 19082
+    ports:
+      - "19082:19082"
+    restart: on-failure
+    environment:
+      SERVICE: api-backend
+      PORT: "19082"
