@@ -634,6 +634,74 @@ Docroid Web Dashboard & Management Server
   - `POST /api/secrets`: Store a new secret key-value
   - `DELETE /api/secrets/{key}`: Delete a secret
   - `GET /api/system`: System doctor report
+  - `GET /api/tunnels`: List all configured Cloudflare tunnels with status & URLs
+  - `POST /api/tunnels`: Create & auto-start a tunnel (port, host, app, quick or token mode)
+  - `GET /api/tunnels/{id}`: Detailed tunnel inspection
+  - `POST /api/tunnels/{id}/start|stop|restart`: Lifecycle control
+  - `GET /api/tunnels/{id}/logs`: Real-time tail of tunnel process logs
+  - `DELETE /api/tunnels/{id}`: Terminate and delete tunnel
+  - `GET /api/tunnels/targets`: Auto-discover running apps, static sites, and UI ports
+  - `GET /api/tunnels/status`: Check cloudflared binary installation status and version
+
+---
+
+## Cloudflare Tunnel Direct Configuration (Expose Any Port or App Globally)
+
+Docroid includes a built-in **Cloudflare Tunnel manager** that lets you expose any application running on any port (or any Docroid container app, static website, or the Web Dashboard itself) to the public internet securely—without port forwarding, static IPs, router access, or public IP addresses.
+
+Supports both:
+1. **Quick Tunnels (Free & Zero-Config)**: Instant ephemeral public `https://*.trycloudflare.com` URL with zero signups or credentials needed.
+2. **Zero Trust Named Tunnels (Custom Domains & Auth)**: Production-ready enterprise tunnels authenticated with a Cloudflare remote tunnel token (`eyJh...`).
+
+### 1. CLI Commands (`docroid tunnel`)
+
+```bash
+# Check cloudflared binary status and detected binary path
+docroid tunnel status
+
+# 1. Expose any arbitrary local port via Quick Tunnel (ephemeral https://*.trycloudflare.com)
+docroid tunnel start -p 8080 -n my-api
+
+# 2. Expose running Docroid container app or static site by name
+docroid tunnel start --app web-demo -n web-public
+
+# 3. Expose any custom hostname or external service
+docroid tunnel start -t http://127.0.0.1:3000 -n nextjs-app
+
+# 4. Run in background (detached daemon mode)
+docroid tunnel start -p 9090 -n docroid-ui -d
+
+# 5. Production Zero Trust Named Tunnel using a Cloudflare Tunnel Token
+docroid tunnel start --token eyJh... --hostname api.mydomain.com -n prod-api -d
+
+# 6. List all tunnels, running state, target port, and public URLs
+docroid tunnel ls
+
+# 7. View live streaming diagnostic logs
+docroid tunnel logs <tunnel-id>
+
+# 8. Manage lifecycle (stop, restart, remove)
+docroid tunnel stop <tunnel-id>
+docroid tunnel restart <tunnel-id>
+docroid tunnel rm <tunnel-id>
+```
+
+### 2. Direct Configuration in the Web Management Dashboard
+
+Access the dashboard at `http://localhost:9090/#tunnels`:
+- **"+ Direct Configure Tunnel" Modal**:
+  - **Auto-Discovery Dropdown**: Select directly from any running Docroid container app, static website, or the Docroid Web Dashboard itself.
+  - **Custom Port / Host Input**: Target any arbitrary local port (e.g. `8080`, `3000`, `5000`) or custom target URL (`http://localhost:8000`).
+  - **Interactive Mode Selector**: One-click toggle between **Quick Tunnel** (instant free URL) and **Zero Trust Token** (named Cloudflare Tunnel).
+  - **Advanced Settings**: Configure custom tunnel names, custom hostnames, auto-start, and auto-restart flags.
+- **Dedicated Tunnels Dashboard**:
+  - Live KPI strip showing Active Tunnels, Quick Tunnels, Zero Trust Tunnels, and Cloudflared engine runtime status.
+  - Interactive tunnel cards with one-click **Copy Public URL** and status indicators (Running, Starting, Stopped, Error).
+  - Direct Action Controls: Start, Stop, Restart, View Logs, and Delete tunnels in real time.
+- **Embedded Dark Terminal Log Viewer**:
+  - Inspect live `cloudflared` diagnostic outputs with auto-refresh and log copy.
+- **Seamless Container & Website Integration**:
+  - Direct **Tunnel** action button on container application cards and static site cards for 1-click exposure.
 
 ---
 

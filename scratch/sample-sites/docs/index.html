@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docroid Developer Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --sidebar: #111827;
+      --card: #1f2937;
+      --border: #374151;
+      --accent: #10b981;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+    aside {
+      width: 260px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    aside h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    aside ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    aside a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      display: block;
+    }
+    aside a.active, aside a:hover {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent);
+    }
+    main {
+      flex: 1;
+      padding: 40px;
+      max-width: 900px;
+    }
+    h1 { font-size: 2.2rem; margin-bottom: 12px; color: #fff; }
+    p { color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+    pre {
+      background: #030712;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h2>Docroid Docs</h2>
+    <ul>
+      <li><a href="#" class="active">Overview & Quickstart</a></li>
+      <li><a href="#">CLI Reference</a></li>
+      <li><a href="#">REST API Specifications</a></li>
+      <li><a href="#">Static Web Hosting</a></li>
+      <li><a href="#">Rootfs Sandbox Engine</a></li>
+    </ul>
+  </aside>
+  <main>
+    <div class="badge">API v2.4 Reference</div>
+    <h1>Quickstart Guide</h1>
+    <p>Deploy native Linux microservices and web apps onto mobile hardware with zero configuration.</p>
+    <pre><code># Run application in background
+docroid run -d -n web-server -p 8080 python3 -m http.server 8080
+
+# Check real-time process metrics
+docroid top web-server</code></pre>
+    <p>Applications execute as isolated processes with process supervision, auto-restarts, and live stdout streaming.</p>
+  </main>
+</body>
+</html>

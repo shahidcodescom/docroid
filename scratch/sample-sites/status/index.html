@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge Cluster Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #131b2e;
+      --border: #1e293b;
+      --ok: #10b981;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .container { width: 100%; max-width: 650px; }
+    .banner {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 16px 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: var(--ok);
+      margin-bottom: 24px;
+    }
+    .pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 12px var(--ok);
+    }
+    .item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .item-title { font-size: 0.95rem; font-weight: 500; }
+    .item-status { font-size: 0.8rem; font-weight: 600; color: var(--ok); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="margin-bottom: 16px; font-size: 1.6rem;">System & Service Status</h1>
+    <div class="banner">
+      <div class="pulse"></div>
+      <span>All Edge Microservices & Nodes Operational</span>
+    </div>
+    <div class="item">
+      <span class="item-title">Docroid Core Engine</span>
+      <span class="item-status">Operational (99.98%)</span>
+    </div>
+    <div class="item">
+      <span class="item-title">TCP Port Forwarding Proxy</span>
+      <span class="item-status">Operational (100%)</span>
+    </div>
+    <div class="item">
+      <span class="item-title">Mesh Cluster Peer Discovery</span>
+      <span class="item-status">Operational (99.95%)</span>
+    </div>
+    <div class="item">
+      <span class="item-title">Static Web Server Subsystem</span>
+      <span class="item-status">Operational (100%)</span>
+    </div>
+  </div>
+</body>
+</html>

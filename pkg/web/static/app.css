@@ -1501,666 +1501,6 @@ select:focus {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* ----------------------------------------------------
-   Responsive Breakpoints & Mobile Optimization
----------------------------------------------------- */
-@media (max-width: 1024px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  /* Layout & Mobile Sidebar */
-  .zoho-app-layout {
-    flex-direction: column;
-  }
-
-  .zoho-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 280px;
-    max-width: 85vw;
-    height: 100vh;
-    height: 100dvh;
-    z-index: 100;
-    transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .zoho-sidebar.mobile-open {
-    transform: translateX(0);
-  }
-
-  .sidebar-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 99;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-
-  .sidebar-backdrop.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .sidebar-close-btn {
-    display: block;
-    padding: 8px;
-    margin: -4px;
-    color: var(--text-secondary);
-    border-radius: var(--radius-sm);
-  }
-
-  .sidebar-close-btn:hover {
-    color: var(--text-primary);
-  }
-
-  .mobile-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 36px;
-    min-height: 36px;
-    border-radius: var(--radius-md);
-  }
-
-  /* Topbar Mobile Density */
-  .zoho-topbar {
-    height: 56px;
-    min-height: 56px;
-    padding: 0 12px;
-    gap: 8px;
-  }
-
-  .topbar-left {
-    gap: 8px;
-    min-width: 0;
-    flex: 1;
-  }
-
-  .breadcrumbs {
-    gap: 6px;
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .breadcrumb-item.active {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .topbar-center {
-    display: none;
-  }
-
-  .topbar-right {
-    gap: 6px;
-    flex-shrink: 0;
-  }
-
-  /* Secondary modal and top-bar deploy buttons are accessible from within views / sidebar on mobile */
-  #btnSecretsModal,
-  #btnDoctorModal,
-  #btnImportModal,
-  #btnDeploySiteTop,
-  #btnDeployPodTop {
-    display: none !important;
-  }
-
-  #btnDeployModal span {
-    display: none;
-  }
-
-  .view-switcher {
-    padding: 1px;
-  }
-
-  .view-btn {
-    padding: 4px 6px;
-  }
-
-  /* Mobile Bottom Navigation Bar */
-  .mobile-bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 56px;
-    background: var(--bg-topbar);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border-subtle);
-    z-index: 50;
-    align-items: stretch;
-    justify-content: space-around;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
-  }
-
-  .bottom-nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 6px 0;
-    transition: color 0.15s ease;
-  }
-
-  .bottom-nav-item svg {
-    width: 20px;
-    height: 20px;
-    stroke-width: 2;
-  }
-
-  .bottom-nav-item.active {
-    color: var(--zoho-blue);
-  }
-
-  /* Workspace Scroll Container */
-  .zoho-content-scroll {
-    padding: 14px 12px calc(68px + env(safe-area-inset-bottom)) 12px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Mobile Search Bar */
-  .mobile-search-bar {
-    display: block;
-    margin-bottom: 14px;
-  }
-
-  .mobile-search-bar .search-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    padding: 8px 12px;
-  }
-
-  /* Compact 2x2 KPI Grid */
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
-  .stat-card {
-    padding: 12px;
-  }
-
-  .stat-value {
-    font-size: 20px;
-    margin-bottom: 2px;
-  }
-
-  .stat-sub {
-    font-size: 10px;
-  }
-
-  /* Filter Controls */
-  .controls-bar {
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .filter-group {
-    max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .filter-btn {
-    white-space: nowrap;
-    padding: 5px 10px;
-    font-size: 11px;
-  }
-
-  /* Grids collapse cleanly into 1-column cards */
-  .apps-grid,
-  .sites-grid,
-  .deployments-grid,
-  .device-nodes-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .app-card,
-  .site-card {
-    padding: 14px;
-  }
-
-  .card-top {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .card-badges {
-    justify-content: flex-start;
-    width: 100%;
-  }
-
-  .card-actions {
-    gap: 6px;
-  }
-
-  .card-actions .btn {
-    flex: 1 1 auto;
-    min-width: 60px;
-    font-size: 11px;
-    padding: 7px 8px;
-    justify-content: center;
-  }
-
-  /* Drawers */
-  .zoho-drawer {
-    width: 100vw;
-    max-width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    border-left: none;
-  }
-
-  .drawer-header {
-    padding: 14px 16px;
-  }
-
-  .drawer-tabs {
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .drawer-tab {
-    padding: 10px 14px;
-  }
-
-  .drawer-tab-panel {
-    padding: 16px 14px;
-  }
-
-  /* Static Websites Responsive Layout */
-  #sectionSites .controls-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  #sectionSites .controls-bar .filter-group {
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-  }
-
-  #sectionSites .controls-bar .controls-right {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-  }
-
-  #sectionSites .controls-bar #btnOpenDeploySiteModal {
-    flex: 1;
-    justify-content: center;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  /* Site Cards */
-  .site-card {
-    padding: 14px;
-    gap: 12px;
-    min-width: 0;
-    width: 100%;
-  }
-
-  .site-card-header {
-    align-items: center;
-  }
-
-  .site-title-area {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .site-name-heading {
-    font-size: 15px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .site-url-box {
-    width: 100%;
-    min-width: 0;
-    padding: 6px 10px;
-  }
-
-  .site-url-link {
-    min-width: 0;
-    flex: 1;
-    font-size: 12px;
-  }
-
-  .site-specs-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 8px 10px;
-  }
-
-  .site-specs-row .site-spec-item:last-child {
-    grid-column: 1 / -1;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    padding-top: 6px;
-    margin-top: 2px;
-  }
-
-  .site-actions-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding-top: 10px;
-  }
-
-  .site-actions-left {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    width: 100%;
-  }
-
-  .site-actions-left .btn {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-    padding: 7px 4px;
-    font-size: 11.5px;
-  }
-
-  .site-actions-right {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    width: 100%;
-    padding-top: 8px;
-    border-top: 1px dashed var(--border-subtle);
-  }
-
-  .site-actions-right .icon-btn-sm {
-    padding: 6px 12px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-  }
-
-  /* Deploy Site Modal & Tabs */
-  .site-tabs {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-    scrollbar-width: none;
-    padding: 3px;
-    gap: 4px;
-  }
-
-  .site-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .site-tab-btn {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding: 7px 11px;
-    font-size: 12px;
-  }
-
-  .dropzone-box {
-    padding: 20px 14px;
-  }
-
-  .dropzone-title {
-    font-size: 13px;
-  }
-
-  .dropzone-sub {
-    font-size: 11px;
-  }
-
-  .dropzone-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .dropzone-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .site-config-grid {
-    margin-top: 1rem;
-  }
-
-  .site-config-grid .form-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .options-row .checkbox-label {
-    font-size: 12px;
-  }
-
-  /* File Explorer Modal */
-  .explorer-body {
-    display: flex;
-    flex-direction: column;
-    min-height: auto;
-    max-height: 65vh;
-    max-height: 65dvh;
-    overflow-y: auto;
-  }
-
-  .explorer-tree-pane {
-    max-height: 160px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-    flex-shrink: 0;
-  }
-
-  .explorer-preview-pane {
-    min-height: 180px;
-    flex: 1;
-  }
-
-  .explorer-file-item {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  /* Table Container Horizontal Scroll */
-  .sites-table-container {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Forms & Modals - Mobile Bottom Sheet */
-  .modal-backdrop {
-    padding: 8px;
-    align-items: flex-end;
-  }
-
-  .modal-dialog {
-    max-height: 90vh;
-    max-height: 90dvh;
-    width: 100%;
-    border-radius: 16px 16px 12px 12px;
-    margin: 0;
-  }
-
-  .modal-header {
-    padding: 14px 16px;
-  }
-
-  .modal-dialog form {
-    padding: 14px 16px;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .compose-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .compose-toolbar-left,
-  .compose-toolbar-right {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .compose-toolbar label,
-  .compose-toolbar button {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .modal-actions {
-    flex-direction: column-reverse;
-    width: 100%;
-    gap: 8px;
-  }
-
-  .modal-actions button {
-    width: 100%;
-    justify-content: center;
-    padding: 10px;
-  }
-
-  /* Input sizing on mobile to prevent iOS auto-zoom */
-  input,
-  select,
-  textarea {
-    font-size: 16px !important;
-  }
-
-  /* Cluster mesh */
-  .cluster-banner {
-    padding: 1rem;
-    gap: 0.75rem;
-  }
-
-  .cluster-banner-left {
-    gap: 0.75rem;
-    width: 100%;
-  }
-
-  .cluster-banner-right {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .cluster-join-box {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .scaling-control-panel {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .scaling-interactive-controls {
-    width: 100%;
-    max-width: 100%;
-    justify-content: space-between;
-  }
-}
-
-@media (max-width: 480px) {
-  .breadcrumb-item:first-child,
-  .breadcrumb-separator {
-    display: none;
-  }
-
-  .breadcrumb-item.active {
-    font-size: 13px;
-    max-width: 130px;
-  }
-
-  #btnDeployModal span,
-  #btnDeploySiteTop span,
-  #btnDeployPodTop span,
-  #btnCreateNetworkTop span {
-    display: none;
-  }
-
-  .view-switcher {
-    display: none;
-  }
-
-  .stats-grid {
-    gap: 8px;
-  }
-
-  .stat-card {
-    padding: 10px;
-  }
-
-  .stat-value {
-    font-size: 18px;
-  }
-
-  .stat-label {
-    font-size: 10px;
-  }
-
-  #sectionSites .stat-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  #sectionSites .stat-badge-pill {
-    font-size: 8.5px;
-    padding: 1px 5px;
-  }
-
-  .app-telemetry {
-    gap: 4px;
-    padding: 6px;
-  }
-
-  .telemetry-val {
-    font-size: 11px;
-  }
-}
-
 /* ====================================================
    Static Websites Hosting Styles
 ==================================================== */
@@ -3568,87 +2908,338 @@ select:focus {
   line-height: 1.5;
 }
 
-/* Responsive Overrides for Docs */
-@media (max-width: 768px) {
-  .docs-layout {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+/* ====================================================
+   Docroid Responsive Breakpoints & Mobile Optimization
+   ==================================================== */
 
-  .docs-toc-card {
-    position: static;
-    max-height: none;
-    padding: 14px;
-  }
-
-  .docs-toc-nav {
-    flex-direction: row;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
-    gap: 6px;
-  }
-
-  .docs-toc-link {
-    flex-shrink: 0;
-    font-size: 12px;
-    padding: 6px 10px;
-  }
-
-  .docs-quick-links {
-    display: none;
-  }
-
-  .docs-grid-two {
-    grid-template-columns: 1fr;
-  }
-
-  .docs-section-card {
-    padding: 16px;
-  }
-
-  .docs-header-banner {
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-
-  .docs-main-title {
-    font-size: 20px;
+@media (max-width: 1024px) {
+  .stats-grid,
+  #sectionSites .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
-/* ====================================================
-   Static Websites Mobile Responsive Overrides
-==================================================== */
 @media (max-width: 768px) {
-  /* Hide topbar deploy buttons on mobile to prevent header overflow */
-  #btnDeploySiteTop,
-  #btnDeployPodTop,
-  #btnClusterSetupTop,
-  #btnCreateNetworkTop {
+  /* Box-sizing and layout containment */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  .zoho-app-layout {
+    flex-direction: column;
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  /* Left Navigation Rail (Mobile Drawer) */
+  .zoho-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 100;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .zoho-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .sidebar-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar-close-btn {
+    display: block;
+    padding: 8px;
+    margin: -4px;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+  }
+
+  .sidebar-close-btn:hover {
+    color: var(--text-primary);
+  }
+
+  .mobile-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: var(--radius-md);
+  }
+
+  /* Topbar Mobile Density & Alignment */
+  .zoho-topbar {
+    height: 56px;
+    min-height: 56px;
+    padding: 0 12px;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .topbar-left {
+    gap: 8px;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .breadcrumbs {
+    gap: 4px;
+    font-size: 13px;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+
+  .breadcrumb-item:first-child,
+  .breadcrumb-separator {
+    display: none;
+  }
+
+  .breadcrumb-item.active {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .topbar-center {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .view-switcher {
+    display: none;
+  }
+
+  /* Secondary modal buttons accessible via sidebar / more nav on mobile */
+  #btnSecretsModal,
+  #btnDoctorModal,
+  #btnImportModal,
+  #btnClusterSetupTop {
     display: none !important;
   }
 
-  /* Static Websites Controls Bar */
+  /* Topbar Deploy Buttons: Compact Touch-Friendly Icon Buttons */
+  #btnDeployModal span,
+  #btnDeploySiteTop span,
+  #btnDeployPodTop span,
+  #btnCreateNetworkTop span {
+    display: none !important;
+  }
+
+  #btnDeployModal,
+  #btnDeploySiteTop,
+  #btnDeployPodTop,
+  #btnCreateNetworkTop {
+    padding: 7px 11px;
+    min-width: 36px;
+    height: 36px;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--bg-topbar);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 50;
+    align-items: stretch;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 0;
+    transition: color 0.15s ease;
+    min-height: 48px;
+  }
+
+  .bottom-nav-item svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--zoho-blue);
+  }
+
+  /* Workspace Scroll Container */
+  .zoho-main {
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+
+  .zoho-content-scroll {
+    padding: 14px 12px calc(80px + env(safe-area-inset-bottom, 16px)) 12px !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  /* Mobile Dedicated Search Bar */
+  .mobile-search-bar {
+    display: block;
+    margin-bottom: 14px;
+    width: 100%;
+  }
+
+  .mobile-search-bar .search-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    padding: 8px 12px;
+    width: 100%;
+    border-radius: var(--radius-md);
+  }
+
+  /* KPI Grid (2x2 on Mobile) */
+  .stats-grid,
+  #sectionSites .stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .stat-card {
+    padding: 10px 12px !important;
+    min-width: 0 !important;
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stat-badge-pill {
+    font-size: 8.5px;
+    padding: 1px 6px;
+  }
+
+  .stat-value {
+    font-size: 19px !important;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stat-sub {
+    font-size: 10px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Filter Controls & Sections */
+  .controls-bar,
   #sectionSites .controls-bar {
+    display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 10px !important;
+    margin-bottom: 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
+  .controls-bar .filter-group,
   #sectionSites .controls-bar .filter-group {
     width: 100% !important;
     display: flex !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
+    gap: 4px !important;
+    padding-bottom: 2px !important;
   }
 
+  .controls-bar .filter-group::-webkit-scrollbar,
   #sectionSites .controls-bar .filter-group::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
 
+  .filter-btn {
+    white-space: nowrap !important;
+    padding: 6px 12px !important;
+    font-size: 11.5px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .controls-bar .controls-right,
   #sectionSites .controls-bar .controls-right {
     width: 100% !important;
     display: flex !important;
@@ -3660,55 +3251,136 @@ select:focus {
   #sectionSites .controls-bar #btnOpenDeploySiteModal {
     flex: 1 !important;
     justify-content: center !important;
-    padding: 8px 14px !important;
+    padding: 9px 14px !important;
     font-size: 13px !important;
   }
 
-  /* Static Websites 2x2 Stats Grid */
-  #sectionSites .stats-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    margin-bottom: 14px !important;
-  }
-
-  #sectionSites .stat-card {
-    padding: 10px !important;
-  }
-
-  #sectionSites .stat-header {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 4px !important;
-  }
-
-  #sectionSites .stat-label {
-    font-size: 10.5px !important;
-  }
-
-  #sectionSites .stat-badge-pill {
-    font-size: 8.5px !important;
-    padding: 1px 6px !important;
-  }
-
-  #sectionSites .stat-value {
-    font-size: 18px !important;
-    margin-bottom: 2px !important;
-  }
-
-  #sectionSites .stat-sub {
-    font-size: 9.5px !important;
-  }
-
-  /* Single Column Site Cards */
-  .sites-grid {
-    grid-template-columns: 1fr !important;
+  /* Grids Containment (Fix for CSS Grid Track Expansion) */
+  .apps-grid,
+  .sites-grid,
+  .nodes-grid,
+  .deployments-grid,
+  .device-nodes-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
 
-  .site-card {
+  .app-card,
+  .site-card,
+  .device-node-card,
+  .deployment-card,
+  .cluster-banner,
+  .docs-section-card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
     padding: 14px !important;
+  }
+
+  /* App Cards */
+  .card-top {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
     width: 100% !important;
     min-width: 0 !important;
+  }
+
+  .app-identity {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+  }
+
+  .app-name {
+    font-size: 15px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .card-badges {
+    justify-content: flex-end !important;
+    max-width: 50% !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .app-command-box {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .app-telemetry {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-bottom: 12px !important;
+  }
+
+  .telemetry-item {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .telemetry-label {
+    font-size: 9.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .telemetry-val {
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .card-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-top: 10px !important;
+  }
+
+  .card-actions .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 12px !important;
+    padding: 8px 6px !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  .card-actions .btn-primary:first-child,
+  .card-actions .btn-danger:first-child {
+    grid-column: 1 / -1 !important;
+    padding: 10px !important;
+    font-size: 13px !important;
+  }
+
+  /* Static Websites Site Cards */
+  .site-card {
     gap: 12px !important;
   }
 
@@ -3734,57 +3406,384 @@ select:focus {
     min-width: 0 !important;
     flex: 1 !important;
     font-size: 12px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 
   .site-specs-row {
-    grid-template-columns: 1fr 1fr !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
     padding: 8px 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .site-specs-row .site-spec-item:last-child {
     grid-column: 1 / -1 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid var(--border-subtle) !important;
     padding-top: 6px !important;
     margin-top: 2px !important;
   }
 
   .site-actions-footer {
+    display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 10px !important;
+    gap: 8px !important;
     padding-top: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .site-actions-left {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 6px !important;
     width: 100% !important;
+    min-width: 0 !important;
   }
 
   .site-actions-left .btn {
     width: 100% !important;
+    min-width: 0 !important;
     justify-content: center !important;
     text-align: center !important;
     padding: 8px 4px !important;
-    font-size: 12px !important;
+    font-size: 11.5px !important;
   }
 
   .site-actions-right {
     display: flex !important;
-    justify-content: flex-end !important;
-    gap: 12px !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 8px !important;
     width: 100% !important;
+    min-width: 0 !important;
     padding-top: 8px !important;
     border-top: 1px dashed var(--border-subtle) !important;
   }
 
+  .site-actions-right .btn,
   .site-actions-right .icon-btn-sm {
-    padding: 6px 14px !important;
-    background: var(--bg-input) !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: var(--radius-sm) !important;
+    flex: 1 1 50% !important;
+    padding: 7px 10px !important;
+    font-size: 11.5px !important;
+    text-align: center !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* Cluster Mesh */
+  .cluster-banner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+  }
+
+  .cluster-banner-left {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .cluster-banner-right {
+    width: 100% !important;
+    display: flex !important;
+  }
+
+  .cluster-banner-right .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .cluster-join-box {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .scaling-control-panel {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .scaling-interactive-controls {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .device-node-stats {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Table Containers Horizontal Scroll */
+  .apps-table-container,
+  .sites-table-container,
+  .pods-table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    min-width: 0 !important;
+  }
+
+  /* Virtual Networks */
+  .network-endpoint-row {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  /* Documentation Section */
+  .docs-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .docs-toc-card {
+    position: static !important;
+    max-height: none !important;
+    padding: 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .docs-toc-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 6px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 6px !important;
+  }
+
+  .docs-toc-link {
+    flex-shrink: 0 !important;
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+  }
+
+  .docs-quick-links {
+    display: none !important;
+  }
+
+  .docs-grid-two {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .docs-section-card {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 16px !important;
+  }
+
+  .docs-section-card pre,
+  .docs-section-card code {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .docs-header-banner {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .docs-main-title {
+    font-size: 20px !important;
+  }
+
+  /* Drawers */
+  .zoho-drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    border-left: none !important;
+    z-index: 105 !important;
+  }
+
+  .drawer-header {
+    padding: 14px 16px !important;
+  }
+
+  .drawer-tabs {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding: 0 12px !important;
+  }
+
+  .drawer-tab {
+    flex: 0 0 auto !important;
+    padding: 12px 14px !important;
+  }
+
+  .drawer-tab-panel {
+    padding: 14px !important;
+    padding-bottom: calc(30px + env(safe-area-inset-bottom, 16px)) !important;
+    overflow-y: auto !important;
+  }
+
+  /* Modals: Modern Mobile Bottom Sheet */
+  .modal-backdrop {
+    padding: 0 !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+  }
+
+  .modal-dialog {
+    max-height: 90vh !important;
+    max-height: 90dvh !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    border-radius: 16px 16px 0 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    transform: translateY(100%) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .modal-backdrop.active .modal-dialog {
+    transform: translateY(0) !important;
+  }
+
+  .modal-header {
+    flex-shrink: 0 !important;
+    padding: 14px 16px !important;
+    background: var(--bg-modal-header) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+  }
+
+  .modal-dialog form,
+  .modal-dialog > div:not(.modal-header) {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 16px !important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0)) !important;
+    min-height: 0 !important;
+  }
+
+  .modal-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: var(--bg-modal) !important;
+    padding: 12px 0 4px 0 !important;
+    margin-top: 14px !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    width: 100% !important;
+    gap: 8px !important;
+    z-index: 5 !important;
+  }
+
+  .modal-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 11px !important;
+    font-size: 13px !important;
+  }
+
+  .form-row,
+  .site-config-grid .form-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .compose-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .compose-toolbar-left,
+  .compose-toolbar-right {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .compose-toolbar label,
+  .compose-toolbar button {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .site-tabs {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+    scrollbar-width: none !important;
+    padding: 4px !important;
+    gap: 6px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .site-tab-btn {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .dropzone-box {
+    padding: 20px 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .dropzone-title {
+    font-size: 13px !important;
+  }
+
+  .dropzone-sub {
+    font-size: 11px !important;
+  }
+
+  .dropzone-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .dropzone-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
   }
 
   /* File Explorer Modal on Mobile */
@@ -3795,6 +3794,7 @@ select:focus {
     max-height: 60vh !important;
     max-height: 60dvh !important;
     overflow-y: auto !important;
+    width: 100% !important;
   }
 
   .explorer-tree-pane {
@@ -3816,67 +3816,220 @@ select:focus {
     font-size: 12px !important;
   }
 
-  /* Deploy Site Modal Tabs */
-  .site-tabs {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    white-space: nowrap !important;
-    scrollbar-width: none !important;
-    padding: 3px !important;
-    gap: 4px !important;
-  }
-
-  .site-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .site-tab-btn {
-    flex: 0 0 auto !important;
-    white-space: nowrap !important;
-    padding: 8px 12px !important;
-    font-size: 12px !important;
-  }
-
-  .dropzone-box {
-    padding: 20px 14px !important;
-  }
-
-  .dropzone-title {
-    font-size: 13px !important;
-  }
-
-  .dropzone-sub {
-    font-size: 11px !important;
-  }
-
-  .dropzone-actions {
-    flex-direction: column !important;
-    gap: 8px !important;
-  }
-
-  .dropzone-actions .btn {
-    width: 100% !important;
-    justify-content: center !important;
-  }
-
-  .site-config-grid {
-    margin-top: 1rem !important;
-  }
-
-  .site-config-grid .form-row {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  .options-row .checkbox-label {
-    font-size: 12px !important;
-  }
-
-  /* Table Container Horizontal Scroll */
-  .sites-table-container {
-    width: 100% !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+  /* Prevent auto-zoom on input focus in iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
+
+@media (max-width: 480px) {
+  .breadcrumb-item.active {
+    font-size: 13px !important;
+    max-width: 140px !important;
+  }
+
+  .stats-grid,
+  #sectionSites .stats-grid {
+    gap: 6px !important;
+  }
+
+  .stat-card {
+    padding: 8px 10px !important;
+  }
+
+  .stat-value {
+    font-size: 17px !important;
+  }
+
+  .stat-label {
+    font-size: 9.5px !important;
+  }
+
+  .card-actions .btn {
+    padding: 8px 4px !important;
+    font-size: 11.5px !important;
+  }
+}
+
+/* Responsive Table Container for Mobile */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Cloudflare Tunnel Integration Design System */
+.tunnel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tunnel-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(243, 128, 32, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.tunnel-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tunnel-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tunnel-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tunnel-id-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.tunnel-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tunnel-status-pill.running {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.tunnel-status-pill.starting {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.tunnel-status-pill.stopped {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.tunnel-status-pill.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.tunnel-url-banner {
+  background: linear-gradient(135deg, rgba(243, 128, 32, 0.1) 0%, rgba(250, 173, 63, 0.05) 100%);
+  border: 1px solid rgba(243, 128, 32, 0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tunnel-url-text {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f38020;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
+
+.tunnel-url-text:hover {
+  text-decoration: underline;
+  color: #faad3f;
+}
+
+.tunnel-url-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.tunnel-mode-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.tunnel-mode-tag.quick {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.tunnel-mode-tag.token {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
+.tunnel-mode-card.active {
+  border-color: #f38020 !important;
+  background: rgba(243, 128, 32, 0.08) !important;
+  box-shadow: 0 0 0 1px #f38020;
+}
+
+.tunnel-source-switcher .btn.active {
+  background: var(--text-primary);
+  color: var(--bg-workspace);
+  font-weight: 700;
+}
+
+.pulse-dot-orange {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #f38020;
+  box-shadow: 0 0 0 rgba(243, 128, 32, 0.4);
+  animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-orange {
+  0% {
+    box-shadow: 0 0 0 0 rgba(243, 128, 32, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(243, 128, 32, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(243, 128, 32, 0);
+  }
+}
+
 

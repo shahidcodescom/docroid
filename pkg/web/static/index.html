@@ -55,6 +55,11 @@
           <span>Networks</span>
           <span class="nav-badge" id="navNetworksBadge">0</span>
         </a>
+        <a href="#tunnels" class="nav-item" id="navTunnels">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="13 11 9 15 13 19"/><line x1="9" y1="15" x2="20" y2="15"/></svg>
+          <span>Cloudflare Tunnels</span>
+          <span class="nav-badge" id="navTunnelsBadge">0</span>
+        </a>
         <a href="#compose" class="nav-item" id="navCompose">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
           <span>Compose Stacks</span>
@@ -182,6 +187,11 @@
           <button class="btn btn-primary" id="btnCreateNetworkTop" style="display:none;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
             <span>Create Network</span>
+          </button>
+
+          <button class="btn btn-primary" id="btnConfigureTunnelTop" style="display:none; background: linear-gradient(135deg, #f38020 0%, #faad3f 100%); border-color: #f38020; color: #fff;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>+ Configure Tunnel</span>
           </button>
         </div>
       </header>
@@ -585,6 +595,82 @@
           <section class="apps-section">
             <div class="apps-grid" id="networksContainer">
               <!-- Rendered dynamically by app.js -->
+            </div>
+          </section>
+        </div>
+
+        <!-- Cloudflare Tunnels Workspace View -->
+        <div id="sectionTunnels" style="display: none;">
+          <!-- KPI Metric Strip -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Active Tunnels</span>
+                <span class="stat-badge-pill green" id="statTunnelsActiveBadge">Live</span>
+              </div>
+              <div class="stat-value" id="statTunnelsActive">0</div>
+              <div class="stat-sub" id="statTunnelsTotal">0 configured tunnels</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Quick Tunnels</span>
+                <span class="stat-badge-pill blue">trycloudflare</span>
+              </div>
+              <div class="stat-value" id="statTunnelsQuick">0</div>
+              <div class="stat-sub">Ephemeral public URLs</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Zero Trust Tunnels</span>
+                <span class="stat-badge-pill purple">Token</span>
+              </div>
+              <div class="stat-value" id="statTunnelsToken">0</div>
+              <div class="stat-sub">Authenticated remote routes</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-label">Cloudflared Runtime</span>
+                <span class="stat-badge-pill amber" id="statCloudflaredStatusPill">Detecting</span>
+              </div>
+              <div class="stat-value" id="statCloudflaredVersion" style="font-size: 1.25rem;">Checking...</div>
+              <div class="stat-sub" id="statCloudflaredPath">System binary status</div>
+            </div>
+          </section>
+
+          <!-- Controls Bar -->
+          <section class="controls-bar">
+            <div class="filter-group">
+              <button class="filter-btn active" id="btnTunnelFilterAll" data-tunnel-filter="all">All (<span id="countTunnelAll">0</span>)</button>
+              <button class="filter-btn" id="btnTunnelFilterActive" data-tunnel-filter="active">Active (<span id="countTunnelActive">0</span>)</button>
+              <button class="filter-btn" id="btnTunnelFilterStopped" data-tunnel-filter="stopped">Stopped</button>
+              <button class="filter-btn" id="btnTunnelFilterQuick" data-tunnel-filter="quick">Quick</button>
+              <button class="filter-btn" id="btnTunnelFilterToken" data-tunnel-filter="token">Token</button>
+            </div>
+
+            <div class="controls-right" style="display:flex; gap:10px; align-items:center;">
+              <button class="btn btn-primary btn-sm" id="btnOpenConfigureTunnelModal" style="background: linear-gradient(135deg, #f38020 0%, #faad3f 100%); border-color: #f38020; color: #fff;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <span>+ Direct Configure Tunnel</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnCheckCloudflared">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Check Binary</span>
+              </button>
+              <span class="badge" id="tunnelsCountBadge">0 tunnels</span>
+            </div>
+          </section>
+
+          <!-- Tunnels Grid -->
+          <section class="apps-section">
+            <div class="apps-grid" id="tunnelsContainer">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+            <!-- High density table view -->
+            <div id="tunnelsTableContainer" class="table-container" style="display:none;">
+              <!-- Rendered dynamically -->
             </div>
           </section>
         </div>
@@ -2058,6 +2144,177 @@ CMD cat /app/greeting.txt</textarea>
           <button type="submit" class="btn btn-primary" id="btnSubmitConnectContainer">Connect</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Configure Cloudflare Tunnel Modal -->
+  <div class="modal-backdrop" id="tunnelModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge" style="background: rgba(243, 128, 32, 0.15); color: #f38020; border-color: rgba(243, 128, 32, 0.3);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+              <polyline points="13 11 9 15 13 19"/>
+              <line x1="9" y1="15" x2="20" y2="15"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Configure Cloudflare Tunnel</h3>
+            <p class="modal-subtitle">Directly connect and expose any application or port through Cloudflare Edge</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeTunnelModal">&times;</button>
+      </div>
+
+      <form id="tunnelForm">
+        <!-- Target Selection Tabs -->
+        <div class="form-group">
+          <label style="font-weight: 600; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span>Target Application or Port <span class="required">*</span></span>
+            <div class="tunnel-source-switcher" style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-xs active" id="btnSourceApp" style="padding: 3px 8px; font-size: 11px;">From Running App</button>
+              <button type="button" class="btn btn-xs" id="btnSourceCustom" style="padding: 3px 8px; font-size: 11px;">Custom Port / Host</button>
+            </div>
+          </label>
+
+          <!-- Source: App Selector -->
+          <div id="tunnelAppSourceGroup">
+            <select id="tunnelTargetSelect" class="form-select" style="width:100%; padding: 10px; border-radius: 6px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-card);">
+              <option value="">Loading running apps and services...</option>
+            </select>
+            <small class="form-hint" style="display:block; margin-top:4px; color:var(--text-muted); font-size:12px;">Docroid detects active containers, static websites, and the Docroid dashboard automatically.</small>
+          </div>
+
+          <!-- Source: Custom Port / URL Input -->
+          <div id="tunnelCustomSourceGroup" style="display:none;">
+            <div style="display: flex; gap: 10px;">
+              <div style="flex: 1;">
+                <label for="tunnelCustomPort" style="font-size:12px; color:var(--text-secondary); margin-bottom:4px; display:block;">Port Number</label>
+                <input type="number" id="tunnelCustomPort" placeholder="e.g. 8080, 3000, 5000" min="1" max="65535" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-card);">
+              </div>
+              <div style="flex: 2;">
+                <label for="tunnelCustomHost" style="font-size:12px; color:var(--text-secondary); margin-bottom:4px; display:block;">Host Interface / IP</label>
+                <input type="text" id="tunnelCustomHost" placeholder="Host (default: 127.0.0.1)" value="127.0.0.1" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-card);">
+              </div>
+            </div>
+            <small class="form-hint" style="display:block; margin-top:4px; color:var(--text-muted); font-size:12px;">Connect any application or service running on any port (Docroid, Node, Python, Docker, Termux, etc.).</small>
+          </div>
+        </div>
+
+        <!-- Tunnel Mode Selection (Visual Cards) -->
+        <div class="form-group" style="margin-top: 18px;">
+          <label style="font-weight: 600; margin-bottom: 8px; display:block;">Tunnel Mode <span class="required">*</span></label>
+          <div class="tunnel-mode-cards" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+            <div class="tunnel-mode-card active" id="cardModeQuick" data-mode="quick" style="cursor:pointer; border: 1.5px solid #f38020; border-radius: 8px; padding: 14px; background: rgba(243,128,32,0.06); transition: all 0.2s ease;">
+              <div class="tunnel-mode-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-weight:700; color:var(--text-primary);">Quick Tunnel</span>
+                <span class="tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 10px; font-weight:700;">FREE • NO ACCOUNT</span>
+              </div>
+              <div class="tunnel-mode-desc" style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">
+                Generates an instant, ephemeral HTTPS URL (*.trycloudflare.com). Zero setup, no login required. Perfect for testing, dev sharing, and mobile edge tunnels.
+              </div>
+            </div>
+
+            <div class="tunnel-mode-card" id="cardModeToken" data-mode="token" style="cursor:pointer; border: 1px solid var(--border-card); border-radius: 8px; padding: 14px; background: var(--bg-card); transition: all 0.2s ease;">
+              <div class="tunnel-mode-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-weight:700; color:var(--text-primary);">Cloudflare Zero Trust</span>
+                <span class="tag" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; font-size: 10px; font-weight:700;">NAMED / TOKEN</span>
+              </div>
+              <div class="tunnel-mode-desc" style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">
+                Connects to your Cloudflare Zero Trust account via Tunnel Token. Route custom domains, apply Access policies, and manage remotely.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Token Input Group (shown only when Token mode is active) -->
+        <div class="form-group" id="tunnelTokenGroup" style="display:none; margin-top: 16px;">
+          <label for="tunnelTokenInput" style="font-weight: 600; margin-bottom:4px; display:block;">Cloudflare Tunnel Token <span class="required">*</span></label>
+          <textarea id="tunnelTokenInput" rows="3" placeholder="Paste your tunnel token from Cloudflare Zero Trust dashboard (e.g. eyJh...)" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-card); font-family:var(--font-mono); font-size:12px;"></textarea>
+          <small class="form-hint" style="display:block; margin-top:4px; color:var(--text-muted); font-size:12px;">Obtain from Cloudflare Zero Trust &rarr; Networks &rarr; Tunnels &rarr; Create a Tunnel.</small>
+        </div>
+
+        <!-- Tunnel Name -->
+        <div class="form-group" style="margin-top: 16px;">
+          <label for="tunnelNameInput" style="font-weight: 600; margin-bottom:4px; display:block;">Tunnel Name</label>
+          <input type="text" id="tunnelNameInput" placeholder="e.g. quote-service-tunnel, port-8080" style="width:100%; padding:10px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-card);">
+          <small class="form-hint" style="display:block; margin-top:4px; color:var(--text-muted); font-size:12px;">Friendly label used to identify this tunnel inside Docroid.</small>
+        </div>
+
+        <!-- Advanced Collapsible Section -->
+        <details class="form-details" style="margin-top: 16px; border: 1px solid var(--border-card); border-radius: 8px; padding: 10px 14px; background: var(--bg-card);">
+          <summary style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); cursor: pointer; user-select: none;">
+            Advanced Options & Routing Flags
+          </summary>
+          <div style="padding-top: 12px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label for="tunnelHostnameInput" style="font-size: 12px; color:var(--text-secondary); margin-bottom:4px; display:block;">Custom Hostname (Optional)</label>
+              <input type="text" id="tunnelHostnameInput" placeholder="e.g. api.yourdomain.com" style="width:100%; padding:8px 10px; border-radius:6px; background:var(--bg-input); color:var(--text-primary); border:1px solid var(--border-card);">
+            </div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+              <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color:var(--text-primary);">
+                <input type="checkbox" id="tunnelAutoStart" checked>
+                <span>Start tunnel immediately after creating</span>
+              </label>
+              <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; color:var(--text-primary);">
+                <input type="checkbox" id="tunnelAutoRestart">
+                <span>Auto-restart if cloudflared disconnects</span>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <div class="modal-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary" id="cancelTunnelModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitTunnel" style="background: linear-gradient(135deg, #f38020 0%, #faad3f 100%); border-color: #f38020; color: #fff;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span>Connect Tunnel</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tunnel Live Logs Modal -->
+  <div class="modal-backdrop" id="tunnelLogsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge" style="background: rgba(243, 128, 32, 0.15); color: #f38020;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          </div>
+          <div>
+            <h3 id="tunnelLogsTitle">Tunnel Diagnostic Logs</h3>
+            <p class="modal-subtitle" id="tunnelLogsSubtitle">Live stdout & stderr from cloudflared connector</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeTunnelLogsModal">&times;</button>
+      </div>
+      <div style="padding: 0 24px 20px 24px;">
+        <div id="tunnelLogsUrlBanner" style="display:none; margin-bottom: 12px; padding: 10px 14px; background: rgba(243,128,32,0.12); border: 1px solid rgba(243,128,32,0.3); border-radius: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11px; font-weight:700; color:#f38020; text-transform:uppercase;">Public URL:</span>
+            <a href="#" target="_blank" id="tunnelLogsPublicLink" style="font-family:var(--font-mono); font-size:13px; color:#f8fafc; font-weight:600; text-decoration:underline;"></a>
+          </div>
+          <button class="btn btn-secondary btn-xs" id="btnCopyLogsPublicURL">Copy URL</button>
+        </div>
+
+        <div class="terminal-box" style="height: 380px; overflow-y: auto; background: #06070a; border: 1px solid var(--border-card); border-radius: 8px; padding: 14px; font-family: var(--font-mono); font-size: 12px; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap;" id="tunnelLogsContent">
+          Loading logs...
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+          <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); cursor: pointer;">
+            <input type="checkbox" id="tunnelLogsAutoRefresh" checked>
+            <span>Auto-refresh (every 2s)</span>
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" id="btnCopyTunnelLogs">Copy Logs</button>
+            <button class="btn btn-secondary btn-sm" id="btnRefreshTunnelLogs">Refresh Now</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

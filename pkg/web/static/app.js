@@ -178,7 +178,9 @@ function initEventListeners() {
       const navCluster = document.getElementById('navCluster');
       if (navCluster) setActiveNavItem(navCluster);
       switchWorkspaceView('cluster');
-      if (typeof fetchClusterStatus === 'function') fetchClusterStatus();
+      currentPodFilter = 'all';
+      if (typeof updatePodFilterButtons === 'function') updatePodFilterButtons();
+      if (typeof fetchClusterData === 'function') fetchClusterData();
     });
   }
 
@@ -263,6 +265,18 @@ function initEventListeners() {
       currentNetFilter = 'all';
       updateNetFilterButtons();
       fetchNetworks();
+    });
+  }
+
+  const navTunnels = document.getElementById('navTunnels');
+  if (navTunnels) {
+    navTunnels.addEventListener('click', (e) => {
+      e.preventDefault();
+      setActiveNavItem(navTunnels);
+      switchWorkspaceView('tunnels');
+      currentTunnelFilter = 'all';
+      updateTunnelFilterButtons();
+      fetchTunnels();
     });
   }
 
@@ -769,6 +783,7 @@ function renderAppsCards(filtered) {
             <button class="btn btn-secondary btn-sm" onclick="stopApp('${a.id}', '${escapeHtml(a.name)}')">Stop</button>
             <button class="btn btn-secondary btn-sm" title="Zero-Downtime Hot Restart" onclick="rollingRestartApp('${a.id}', '${escapeHtml(a.name)}')" style="display:inline-flex; align-items:center; gap:4px;">${Icons.zap} <span>Hot Restart</span></button>
             <button class="btn btn-secondary btn-sm" onclick="openUpdateModal('${a.id}', '${escapeHtml(a.name)}')">Update</button>
+            <button class="btn btn-secondary btn-sm" title="Expose via Cloudflare Tunnel" onclick="openTunnelModalForApp('${a.id}', '${escapeHtml(a.name)}', ${a.port || 0})" style="display:inline-flex; align-items:center; gap:4px; color:#f38020; border-color:rgba(243,128,32,0.35);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg> <span>Tunnel</span></button>
           ` : `
             <button class="btn btn-primary btn-sm" onclick="startApp('${a.id}', '${escapeHtml(a.name)}')">Start</button>
           `}
@@ -853,6 +868,7 @@ function renderAppsTable(filtered) {
               <button class="btn btn-secondary btn-sm" onclick="stopApp('${a.id}', '${escapeHtml(a.name)}')">Stop</button>
               <button class="btn btn-secondary btn-sm" title="Zero-Downtime Hot Restart" onclick="rollingRestartApp('${a.id}', '${escapeHtml(a.name)}')" style="display:inline-flex; align-items:center; gap:4px;">${Icons.zap} <span>Hot</span></button>
               <button class="btn btn-secondary btn-sm" onclick="openUpdateModal('${a.id}', '${escapeHtml(a.name)}')">Update</button>
+              <button class="btn btn-secondary btn-sm" title="Expose via Cloudflare Tunnel" onclick="openTunnelModalForApp('${a.id}', '${escapeHtml(a.name)}', ${a.port || 0})" style="color:#f38020; border-color:rgba(243,128,32,0.35);">Tunnel</button>
             ` : `
               <button class="btn btn-primary btn-sm" onclick="startApp('${a.id}', '${escapeHtml(a.name)}')">Start</button>
             `}
@@ -1945,6 +1961,7 @@ function switchWorkspaceView(view) {
   const sectionSites = document.getElementById('sectionSites');
   const sectionCluster = document.getElementById('sectionCluster');
   const sectionNetworks = document.getElementById('sectionNetworks');
+  const sectionTunnels = document.getElementById('sectionTunnels');
   const sectionDocs = document.getElementById('sectionDocs');
   const breadcrumb = document.getElementById('breadcrumbActive');
   const btnDeployApp = document.getElementById('btnDeployModal');
@@ -1952,12 +1969,14 @@ function switchWorkspaceView(view) {
   const btnDeployPod = document.getElementById('btnDeployPodTop');
   const btnClusterSetup = document.getElementById('btnClusterSetupTop');
   const btnCreateNetwork = document.getElementById('btnCreateNetworkTop');
+  const btnConfigureTunnel = document.getElementById('btnConfigureTunnelTop');
 
   if (view === 'docs') {
     if (sectionApps) sectionApps.style.display = 'none';
     if (sectionSites) sectionSites.style.display = 'none';
     if (sectionCluster) sectionCluster.style.display = 'none';
     if (sectionNetworks) sectionNetworks.style.display = 'none';
+    if (sectionTunnels) sectionTunnels.style.display = 'none';
     if (sectionDocs) sectionDocs.style.display = 'block';
     if (breadcrumb) breadcrumb.textContent = 'Documentation & Developer Reference';
     if (btnDeployApp) btnDeployApp.style.display = 'none';
@@ -1965,11 +1984,13 @@ function switchWorkspaceView(view) {
     if (btnDeployPod) btnDeployPod.style.display = 'none';
     if (btnClusterSetup) btnClusterSetup.style.display = 'none';
     if (btnCreateNetwork) btnCreateNetwork.style.display = 'none';
+    if (btnConfigureTunnel) btnConfigureTunnel.style.display = 'none';
   } else if (view === 'sites') {
     if (sectionApps) sectionApps.style.display = 'none';
     if (sectionSites) sectionSites.style.display = 'block';
     if (sectionCluster) sectionCluster.style.display = 'none';
     if (sectionNetworks) sectionNetworks.style.display = 'none';
+    if (sectionTunnels) sectionTunnels.style.display = 'none';
     if (sectionDocs) sectionDocs.style.display = 'none';
     if (breadcrumb) breadcrumb.textContent = 'Static Websites';
     if (btnDeployApp) btnDeployApp.style.display = 'none';
@@ -1977,11 +1998,13 @@ function switchWorkspaceView(view) {
     if (btnDeployPod) btnDeployPod.style.display = 'none';
     if (btnClusterSetup) btnClusterSetup.style.display = 'none';
     if (btnCreateNetwork) btnCreateNetwork.style.display = 'none';
+    if (btnConfigureTunnel) btnConfigureTunnel.style.display = 'none';
   } else if (view === 'cluster') {
     if (sectionApps) sectionApps.style.display = 'none';
     if (sectionSites) sectionSites.style.display = 'none';
     if (sectionCluster) sectionCluster.style.display = 'block';
     if (sectionNetworks) sectionNetworks.style.display = 'none';
+    if (sectionTunnels) sectionTunnels.style.display = 'none';
     if (sectionDocs) sectionDocs.style.display = 'none';
     if (breadcrumb) breadcrumb.textContent = 'Cluster & Pods Scaling';
     if (btnDeployApp) btnDeployApp.style.display = 'none';
@@ -1989,11 +2012,13 @@ function switchWorkspaceView(view) {
     if (btnDeployPod) btnDeployPod.style.display = 'inline-flex';
     if (btnClusterSetup) btnClusterSetup.style.display = 'inline-flex';
     if (btnCreateNetwork) btnCreateNetwork.style.display = 'none';
+    if (btnConfigureTunnel) btnConfigureTunnel.style.display = 'none';
   } else if (view === 'networks') {
     if (sectionApps) sectionApps.style.display = 'none';
     if (sectionSites) sectionSites.style.display = 'none';
     if (sectionCluster) sectionCluster.style.display = 'none';
     if (sectionNetworks) sectionNetworks.style.display = 'block';
+    if (sectionTunnels) sectionTunnels.style.display = 'none';
     if (sectionDocs) sectionDocs.style.display = 'none';
     if (breadcrumb) breadcrumb.textContent = 'Virtual Networks & Inter-Container Intercom';
     if (btnDeployApp) btnDeployApp.style.display = 'none';
@@ -2001,11 +2026,27 @@ function switchWorkspaceView(view) {
     if (btnDeployPod) btnDeployPod.style.display = 'none';
     if (btnClusterSetup) btnClusterSetup.style.display = 'none';
     if (btnCreateNetwork) btnCreateNetwork.style.display = 'inline-flex';
+    if (btnConfigureTunnel) btnConfigureTunnel.style.display = 'none';
+  } else if (view === 'tunnels') {
+    if (sectionApps) sectionApps.style.display = 'none';
+    if (sectionSites) sectionSites.style.display = 'none';
+    if (sectionCluster) sectionCluster.style.display = 'none';
+    if (sectionNetworks) sectionNetworks.style.display = 'none';
+    if (sectionTunnels) sectionTunnels.style.display = 'block';
+    if (sectionDocs) sectionDocs.style.display = 'none';
+    if (breadcrumb) breadcrumb.textContent = 'Cloudflare Tunnels & Direct Port Routing';
+    if (btnDeployApp) btnDeployApp.style.display = 'none';
+    if (btnDeploySite) btnDeploySite.style.display = 'none';
+    if (btnDeployPod) btnDeployPod.style.display = 'none';
+    if (btnClusterSetup) btnClusterSetup.style.display = 'none';
+    if (btnCreateNetwork) btnCreateNetwork.style.display = 'none';
+    if (btnConfigureTunnel) btnConfigureTunnel.style.display = 'inline-flex';
   } else {
     if (sectionApps) sectionApps.style.display = 'block';
     if (sectionSites) sectionSites.style.display = 'none';
     if (sectionCluster) sectionCluster.style.display = 'none';
     if (sectionNetworks) sectionNetworks.style.display = 'none';
+    if (sectionTunnels) sectionTunnels.style.display = 'none';
     if (sectionDocs) sectionDocs.style.display = 'none';
     if (breadcrumb) breadcrumb.textContent = 'Applications Workspace';
     if (btnDeployApp) btnDeployApp.style.display = 'inline-flex';
@@ -2013,7 +2054,10 @@ function switchWorkspaceView(view) {
     if (btnDeployPod) btnDeployPod.style.display = 'none';
     if (btnClusterSetup) btnClusterSetup.style.display = 'none';
     if (btnCreateNetwork) btnCreateNetwork.style.display = 'none';
+    if (btnConfigureTunnel) btnConfigureTunnel.style.display = 'none';
   }
+
+  if (breadcrumb) breadcrumb.title = breadcrumb.textContent;
 
   // Synchronize Mobile Bottom Navigation Active State
   const bottomNavItems = document.querySelectorAll('.bottom-nav-item[data-view]');
@@ -4107,6 +4151,11 @@ function handleUrlHash() {
     if (navNetworks) setActiveNavItem(navNetworks);
     switchWorkspaceView('networks');
     fetchNetworks();
+  } else if (hash === 'tunnels') {
+    const navTunnels = document.getElementById('navTunnels');
+    if (navTunnels) setActiveNavItem(navTunnels);
+    switchWorkspaceView('tunnels');
+    fetchTunnels();
   } else if (hash === 'apps') {
     const navApps = document.getElementById('navApps');
     if (navApps) setActiveNavItem(navApps);
@@ -4115,4 +4164,726 @@ function handleUrlHash() {
 }
 
 setTimeout(initDocs, 0);
+
+// ==========================================
+// Cloudflare Tunnel Management Subsystem
+// ==========================================
+
+let tunnels = [];
+let currentTunnelFilter = 'all';
+let tunnelLogsTimer = null;
+let activeLogsTunnelID = null;
+let selectedTunnelTargetType = 'app';
+let selectedTunnelMode = 'quick';
+let discoverableTargetsCache = [];
+
+async function fetchTunnels() {
+  try {
+    const [tunnelsRes, statusRes] = await Promise.all([
+      fetch('/api/tunnels'),
+      fetch('/api/tunnels/status')
+    ]);
+
+    if (tunnelsRes.ok) {
+      tunnels = await tunnelsRes.json();
+    }
+    if (statusRes.ok) {
+      const status = await statusRes.json();
+      updateCloudflaredStatus(status);
+    }
+
+    updateTunnelStats();
+    renderTunnels();
+  } catch (err) {
+    console.error('Error fetching tunnels:', err);
+  }
+}
+
+function updateCloudflaredStatus(status) {
+  const pill = document.getElementById('statCloudflaredStatusPill');
+  const verEl = document.getElementById('statCloudflaredVersion');
+  const pathEl = document.getElementById('statCloudflaredPath');
+
+  if (status.installed) {
+    if (pill) {
+      pill.textContent = 'Active';
+      pill.className = 'stat-badge-pill green';
+    }
+    if (verEl) verEl.textContent = `v${status.version || 'installed'}`;
+    if (pathEl) pathEl.textContent = status.path || 'System binary ready';
+  } else {
+    if (pill) {
+      pill.textContent = 'Missing';
+      pill.className = 'stat-badge-pill amber';
+    }
+    if (verEl) verEl.textContent = 'Not Found';
+    if (pathEl) pathEl.textContent = 'Run: pkg install cloudflared / brew install cloudflared';
+  }
+}
+
+function updateTunnelStats() {
+  const activeCount = tunnels.filter(t => t.status === 'running' || t.status === 'starting').length;
+  const quickCount = tunnels.filter(t => t.mode === 'quick').length;
+  const tokenCount = tunnels.filter(t => t.mode === 'token').length;
+
+  const statActive = document.getElementById('statTunnelsActive');
+  const statTotal = document.getElementById('statTunnelsTotal');
+  const statQuick = document.getElementById('statTunnelsQuick');
+  const statToken = document.getElementById('statTunnelsToken');
+  const navBadge = document.getElementById('navTunnelsBadge');
+  const countBadge = document.getElementById('tunnelsCountBadge');
+  const countAll = document.getElementById('countTunnelAll');
+  const countActive = document.getElementById('countTunnelActive');
+
+  if (statActive) statActive.textContent = activeCount;
+  if (statTotal) statTotal.textContent = `${tunnels.length} configured tunnels`;
+  if (statQuick) statQuick.textContent = quickCount;
+  if (statToken) statToken.textContent = tokenCount;
+  if (navBadge) navBadge.textContent = activeCount;
+  if (countBadge) countBadge.textContent = `${tunnels.length} tunnels`;
+  if (countAll) countAll.textContent = tunnels.length;
+  if (countActive) countActive.textContent = activeCount;
+}
+
+function renderTunnels() {
+  const container = document.getElementById('tunnelsContainer');
+  if (!container) return;
+
+  let filtered = tunnels;
+  if (currentTunnelFilter === 'active') {
+    filtered = tunnels.filter(t => t.status === 'running' || t.status === 'starting');
+  } else if (currentTunnelFilter === 'stopped') {
+    filtered = tunnels.filter(t => t.status === 'stopped' || t.status === 'error');
+  } else if (currentTunnelFilter === 'quick') {
+    filtered = tunnels.filter(t => t.mode === 'quick');
+  } else if (currentTunnelFilter === 'token') {
+    filtered = tunnels.filter(t => t.mode === 'token');
+  }
+
+  if (searchKeyword) {
+    filtered = filtered.filter(t =>
+      (t.name || '').toLowerCase().includes(searchKeyword) ||
+      (t.id || '').toLowerCase().includes(searchKeyword) ||
+      (t.target || '').toLowerCase().includes(searchKeyword) ||
+      (t.public_url || '').toLowerCase().includes(searchKeyword) ||
+      (t.app_name || '').toLowerCase().includes(searchKeyword)
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="loading-placeholder" style="grid-column: 1 / -1; padding: 48px; text-align: center;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f38020" stroke-width="1.5" style="margin-bottom:14px;">
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          <polyline points="13 11 9 15 13 19"/>
+          <line x1="9" y1="15" x2="20" y2="15"/>
+        </svg>
+        <p style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">No Cloudflare Tunnels Configured</p>
+        <p style="font-size:13px; color:var(--text-muted); max-width:440px; margin:0 auto 18px; line-height:1.5;">
+          Directly expose any local port, Docroid container, or web service through Cloudflare's global edge network with instant public URLs.
+        </p>
+        <button class="btn btn-primary" onclick="openTunnelModal()" style="background: linear-gradient(135deg, #f38020 0%, #faad3f 100%); border-color: #f38020; color: #fff;">
+          + Direct Configure Tunnel
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(t => {
+    const isRunning = t.status === 'running';
+    const isStarting = t.status === 'starting';
+    const isError = t.status === 'error';
+    const isQuick = t.mode === 'quick';
+
+    let statusPill = '';
+    if (isRunning) {
+      statusPill = `<span class="tunnel-status-pill running"><span class="pulse-dot"></span> RUNNING</span>`;
+    } else if (isStarting) {
+      statusPill = `<span class="tunnel-status-pill starting"><span class="pulse-dot-orange"></span> CONNECTING...</span>`;
+    } else if (isError) {
+      statusPill = `<span class="tunnel-status-pill error">ERROR</span>`;
+    } else {
+      statusPill = `<span class="tunnel-status-pill stopped">STOPPED</span>`;
+    }
+
+    let urlBannerHTML = '';
+    if (t.public_url) {
+      urlBannerHTML = `
+        <div class="tunnel-url-banner">
+          <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f38020" stroke-width="2" style="flex-shrink:0;"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <a href="${escapeHtml(t.public_url)}" target="_blank" class="tunnel-url-text" title="Open ${escapeHtml(t.public_url)}">
+              ${escapeHtml(t.public_url)}
+            </a>
+          </div>
+          <div class="tunnel-url-actions">
+            <button class="btn btn-secondary btn-xs" onclick="copyTunnelURL('${escapeHtml(t.public_url)}', this)" title="Copy public URL">
+              Copy URL
+            </button>
+            <a href="${escapeHtml(t.public_url)}" target="_blank" class="btn btn-primary btn-xs" style="background:#f38020; border-color:#f38020; color:#fff;" title="Visit Public URL">
+              Visit &rarr;
+            </a>
+          </div>
+        </div>
+      `;
+    } else if (isStarting) {
+      urlBannerHTML = `
+        <div class="tunnel-url-banner" style="background:rgba(245, 158, 11, 0.1); border-color:rgba(245, 158, 11, 0.3);">
+          <div style="font-size:12px; color:#fbbf24; display:flex; align-items:center; gap:8px;">
+            <span class="pulse-dot-orange"></span>
+            Negotiating tunnel route with Cloudflare Edge...
+          </div>
+        </div>
+      `;
+    } else if (isError) {
+      urlBannerHTML = `
+        <div class="tunnel-url-banner" style="background:rgba(239, 68, 68, 0.1); border-color:rgba(239, 68, 68, 0.3);">
+          <div style="font-size:12px; color:#f87171;">
+            <strong>Error:</strong> ${escapeHtml(t.last_error || 'Cloudflared terminated unexpectedly')}
+          </div>
+        </div>
+      `;
+    } else {
+      urlBannerHTML = `
+        <div class="tunnel-url-banner" style="background:rgba(148, 163, 184, 0.08); border-color:rgba(148, 163, 184, 0.2);">
+          <div style="font-size:12px; color:var(--text-muted);">
+            Tunnel is stopped. Click Start to reconnect.
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="tunnel-card">
+        <div>
+          <div class="tunnel-card-header">
+            <div class="tunnel-identity">
+              <div class="tunnel-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f38020" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="13 11 9 15 13 19"/><line x1="9" y1="15" x2="20" y2="15"/></svg>
+                <span>${escapeHtml(t.name)}</span>
+              </div>
+              <span class="tunnel-id-badge">ID: ${t.id}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="tunnel-mode-tag ${isQuick ? 'quick' : 'token'}">
+                ${isQuick ? 'Quick Tunnel' : 'Zero Trust'}
+              </span>
+              ${statusPill}
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+            <div style="font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+              <span style="font-weight:600; color:var(--text-muted);">TARGET:</span>
+              <span style="font-family:var(--font-mono); color:var(--text-primary); font-weight:600;">${escapeHtml(t.target)}</span>
+            </div>
+            ${t.app_name ? `
+              <span class="tag" style="background:rgba(220, 38, 38, 0.15); color:#f87171; font-size:11px;">
+                App: ${escapeHtml(t.app_name)}
+              </span>
+            ` : ''}
+          </div>
+
+          ${urlBannerHTML}
+
+          <div class="app-telemetry" style="margin: 10px 0;">
+            <div class="telemetry-item">
+              <span class="telemetry-label">Port</span>
+              <span class="telemetry-val" style="font-family:var(--font-mono); font-weight:700; color:var(--accent-cyan);">${t.target_port || '-'}</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">PID</span>
+              <span class="telemetry-val">${t.pid || '-'}</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Created</span>
+              <span class="telemetry-val" style="font-size:11px;">${new Date(t.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions" style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-card); display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+          <div style="display:flex; gap:6px;">
+            ${(isRunning || isStarting) ? `
+              <button class="btn btn-secondary btn-sm" onclick="stopTunnel('${t.id}', '${escapeHtml(t.name)}')">Stop</button>
+              <button class="btn btn-secondary btn-sm" onclick="restartTunnel('${t.id}', '${escapeHtml(t.name)}')">Restart</button>
+            ` : `
+              <button class="btn btn-primary btn-sm" onclick="startTunnel('${t.id}', '${escapeHtml(t.name)}')">Start</button>
+            `}
+            <button class="btn btn-secondary btn-sm" onclick="openTunnelLogs('${t.id}', '${escapeHtml(t.name)}', '${escapeHtml(t.public_url || '')}')">Logs</button>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="deleteTunnel('${t.id}', '${escapeHtml(t.name)}')">
+            Delete
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateTunnelFilterButtons() {
+  const filterBtns = document.querySelectorAll('[data-tunnel-filter]');
+  filterBtns.forEach(btn => {
+    if (btn.getAttribute('data-tunnel-filter') === currentTunnelFilter) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
+async function openTunnelModal(prefillAppID, prefillAppName, prefillPort) {
+  const modal = document.getElementById('tunnelModal');
+  if (!modal) return;
+
+  const targetSelect = document.getElementById('tunnelTargetSelect');
+  const customPort = document.getElementById('tunnelCustomPort');
+  const customHost = document.getElementById('tunnelCustomHost');
+  const nameInput = document.getElementById('tunnelNameInput');
+  const tokenInput = document.getElementById('tunnelTokenInput');
+  const hostnameInput = document.getElementById('tunnelHostnameInput');
+
+  // Reset form
+  if (tokenInput) tokenInput.value = '';
+  if (hostnameInput) hostnameInput.value = '';
+
+  // Set mode to Quick Tunnel by default
+  setTunnelMode('quick');
+
+  // Load targets
+  try {
+    targetSelect.innerHTML = '<option value="">Loading running apps...</option>';
+    const res = await fetch('/api/tunnels/targets');
+    if (res.ok) {
+      discoverableTargetsCache = await res.json();
+      if (discoverableTargetsCache.length === 0) {
+        targetSelect.innerHTML = '<option value="">(No running apps detected — use Custom Port)</option>';
+        setTunnelTargetSource('custom');
+      } else {
+        targetSelect.innerHTML = discoverableTargetsCache.map(tgt => `
+          <option value="${tgt.port}" data-app-id="${tgt.id}" data-app-name="${escapeHtml(tgt.name)}" data-target-url="${tgt.url}">
+            ${escapeHtml(tgt.name)} — Port ${tgt.port} (${tgt.type})
+          </option>
+        `).join('');
+        setTunnelTargetSource('app');
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load targets:', err);
+    setTunnelTargetSource('custom');
+  }
+
+  // Handle prefill if passed
+  if (prefillAppID || prefillPort) {
+    if (prefillAppName && nameInput) {
+      nameInput.value = `${prefillAppName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-tunnel`;
+    }
+    if (prefillPort && customPort) {
+      customPort.value = prefillPort;
+    }
+
+    // Try selecting in dropdown
+    if (prefillAppID && targetSelect) {
+      for (let i = 0; i < targetSelect.options.length; i++) {
+        if (targetSelect.options[i].getAttribute('data-app-id') === prefillAppID) {
+          targetSelect.selectedIndex = i;
+          setTunnelTargetSource('app');
+          break;
+        }
+      }
+    }
+  } else {
+    if (nameInput) {
+      nameInput.value = `tunnel-${Math.random().toString(36).substring(2, 7)}`;
+    }
+  }
+
+  modal.classList.add('active');
+}
+
+function openTunnelModalForApp(appID, appName, port) {
+  openTunnelModal(appID, appName, port);
+}
+
+function setTunnelTargetSource(type) {
+  selectedTunnelTargetType = type;
+  const btnApp = document.getElementById('btnSourceApp');
+  const btnCustom = document.getElementById('btnSourceCustom');
+  const appGroup = document.getElementById('tunnelAppSourceGroup');
+  const customGroup = document.getElementById('tunnelCustomSourceGroup');
+
+  if (type === 'custom') {
+    if (btnApp) btnApp.classList.remove('active');
+    if (btnCustom) btnCustom.classList.add('active');
+    if (appGroup) appGroup.style.display = 'none';
+    if (customGroup) customGroup.style.display = 'block';
+  } else {
+    if (btnApp) btnApp.classList.add('active');
+    if (btnCustom) btnCustom.classList.remove('active');
+    if (appGroup) appGroup.style.display = 'block';
+    if (customGroup) customGroup.style.display = 'none';
+  }
+}
+
+function setTunnelMode(mode) {
+  selectedTunnelMode = mode;
+  const cardQuick = document.getElementById('cardModeQuick');
+  const cardToken = document.getElementById('cardModeToken');
+  const tokenGroup = document.getElementById('tunnelTokenGroup');
+
+  if (mode === 'token') {
+    if (cardQuick) cardQuick.classList.remove('active');
+    if (cardToken) cardToken.classList.add('active');
+    if (tokenGroup) tokenGroup.style.display = 'block';
+  } else {
+    if (cardQuick) cardQuick.classList.add('active');
+    if (cardToken) cardToken.classList.remove('active');
+    if (tokenGroup) tokenGroup.style.display = 'none';
+  }
+}
+
+async function submitCreateTunnel(e) {
+  if (e) e.preventDefault();
+
+  const nameInput = document.getElementById('tunnelNameInput');
+  const tokenInput = document.getElementById('tunnelTokenInput');
+  const hostnameInput = document.getElementById('tunnelHostnameInput');
+  const autoStartCheck = document.getElementById('tunnelAutoStart');
+  const autoRestartCheck = document.getElementById('tunnelAutoRestart');
+  const submitBtn = document.getElementById('btnSubmitTunnel');
+
+  let targetPort = 0;
+  let targetStr = '';
+  let appID = '';
+  let appName = '';
+
+  if (selectedTunnelTargetType === 'app') {
+    const targetSelect = document.getElementById('tunnelTargetSelect');
+    if (targetSelect && targetSelect.selectedOptions.length > 0) {
+      const opt = targetSelect.selectedOptions[0];
+      targetPort = parseInt(opt.value, 10) || 0;
+      targetStr = opt.getAttribute('data-target-url') || `http://127.0.0.1:${targetPort}`;
+      appID = opt.getAttribute('data-app-id') || '';
+      appName = opt.getAttribute('data-app-name') || '';
+    }
+  } else {
+    const portInput = document.getElementById('tunnelCustomPort');
+    const hostInput = document.getElementById('tunnelCustomHost');
+    targetPort = parseInt(portInput.value, 10) || 0;
+    const host = (hostInput && hostInput.value.trim()) ? hostInput.value.trim() : '127.0.0.1';
+    targetStr = `http://${host}:${targetPort}`;
+  }
+
+  if (selectedTunnelMode !== 'token' && targetPort <= 0 && !targetStr) {
+    showToast('Please select an application or specify a valid port number.', 'error');
+    return;
+  }
+
+  if (selectedTunnelMode === 'token' && (!tokenInput || !tokenInput.value.trim())) {
+    showToast('Cloudflare Tunnel Token is required for Zero Trust mode.', 'error');
+    return;
+  }
+
+  const payload = {
+    name: nameInput ? nameInput.value.trim() : '',
+    app_id: appID,
+    app_name: appName,
+    target: targetStr,
+    target_port: targetPort,
+    mode: selectedTunnelMode,
+    token: tokenInput ? tokenInput.value.trim() : '',
+    hostname: hostnameInput ? hostnameInput.value.trim() : '',
+    auto_start: autoStartCheck ? autoStartCheck.checked : true,
+    auto_restart: autoRestartCheck ? autoRestartCheck.checked : false
+  };
+
+  const originalBtnHTML = submitBtn ? submitBtn.innerHTML : '';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span>Connecting to Cloudflare...</span>`;
+  }
+
+  try {
+    const res = await fetch('/api/tunnels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to configure tunnel');
+    }
+
+    showToast(`Tunnel '${data.name}' configured and starting!`, 'success');
+    document.getElementById('tunnelModal').classList.remove('active');
+    
+    // Switch to tunnels view if not already there
+    switchWorkspaceView('tunnels');
+    const navTunnels = document.getElementById('navTunnels');
+    if (navTunnels) setActiveNavItem(navTunnels);
+
+    await fetchTunnels();
+
+    // Poll a few times for instant URL display
+    let pollCount = 0;
+    const quickPoll = setInterval(async () => {
+      pollCount++;
+      await fetchTunnels();
+      const current = tunnels.find(t => t.id === data.id);
+      if (current && (current.public_url || current.status === 'running' || pollCount > 10)) {
+        clearInterval(quickPoll);
+      }
+    }, 1500);
+
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnHTML;
+    }
+  }
+}
+
+async function startTunnel(id, name) {
+  try {
+    const res = await fetch(`/api/tunnels/${encodeURIComponent(id)}/start`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to start tunnel');
+    showToast(`Tunnel '${name || id}' starting...`, 'info');
+    await fetchTunnels();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function stopTunnel(id, name) {
+  try {
+    const res = await fetch(`/api/tunnels/${encodeURIComponent(id)}/stop`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to stop tunnel');
+    showToast(`Tunnel '${name || id}' stopped.`, 'success');
+    await fetchTunnels();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function restartTunnel(id, name) {
+  try {
+    showToast(`Restarting tunnel '${name || id}'...`, 'info');
+    const res = await fetch(`/api/tunnels/${encodeURIComponent(id)}/restart`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to restart tunnel');
+    showToast(`Tunnel '${name || id}' restarted.`, 'success');
+    await fetchTunnels();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deleteTunnel(id, name) {
+  if (!confirm(`Are you sure you want to delete tunnel '${name || id}'? This will stop the cloudflared process and remove the configuration.`)) {
+    return;
+  }
+  try {
+    const res = await fetch(`/api/tunnels/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || 'Failed to delete tunnel');
+    }
+    showToast(`Tunnel '${name || id}' deleted.`, 'success');
+    await fetchTunnels();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function copyTunnelURL(url, btn) {
+  if (!url) return;
+  navigator.clipboard.writeText(url).then(() => {
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.style.borderColor = '#10b981';
+      btn.style.color = '#34d399';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 2000);
+    }
+    showToast('Public Cloudflare URL copied to clipboard!', 'success');
+  }).catch(() => {
+    prompt('Copy public URL:', url);
+  });
+}
+
+async function openTunnelLogs(id, name, publicURL) {
+  activeLogsTunnelID = id;
+  const modal = document.getElementById('tunnelLogsModal');
+  const title = document.getElementById('tunnelLogsTitle');
+  const subtitle = document.getElementById('tunnelLogsSubtitle');
+  const content = document.getElementById('tunnelLogsContent');
+  const urlBanner = document.getElementById('tunnelLogsUrlBanner');
+  const publicLink = document.getElementById('tunnelLogsPublicLink');
+
+  if (title) title.textContent = `Logs: ${name || id}`;
+  if (subtitle) subtitle.textContent = `Live stdout & stderr for tunnel ${id}`;
+  if (content) content.textContent = 'Loading logs...';
+
+  if (publicURL && urlBanner && publicLink) {
+    urlBanner.style.display = 'flex';
+    publicLink.textContent = publicURL;
+    publicLink.href = publicURL;
+  } else if (urlBanner) {
+    urlBanner.style.display = 'none';
+  }
+
+  if (modal) modal.classList.add('active');
+
+  await refreshTunnelLogs();
+
+  if (tunnelLogsTimer) clearInterval(tunnelLogsTimer);
+  tunnelLogsTimer = setInterval(() => {
+    const autoRefresh = document.getElementById('tunnelLogsAutoRefresh');
+    if (autoRefresh && autoRefresh.checked && modal && modal.classList.contains('active')) {
+      refreshTunnelLogs();
+    }
+  }, 2000);
+}
+
+async function refreshTunnelLogs() {
+  if (!activeLogsTunnelID) return;
+  try {
+    const res = await fetch(`/api/tunnels/${encodeURIComponent(activeLogsTunnelID)}/logs?lines=150`);
+    if (res.ok) {
+      const data = await res.json();
+      const content = document.getElementById('tunnelLogsContent');
+      if (content) {
+        content.textContent = data.logs || '(No logs recorded yet)';
+        content.scrollTop = content.scrollHeight;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to refresh tunnel logs:', err);
+  }
+}
+
+function closeTunnelLogs() {
+  if (tunnelLogsTimer) {
+    clearInterval(tunnelLogsTimer);
+    tunnelLogsTimer = null;
+  }
+  activeLogsTunnelID = null;
+  const modal = document.getElementById('tunnelLogsModal');
+  if (modal) modal.classList.remove('active');
+}
+
+async function checkCloudflaredBinary() {
+  try {
+    const res = await fetch('/api/tunnels/status');
+    const status = await res.json();
+    updateCloudflaredStatus(status);
+    if (status.installed) {
+      showToast(`✓ cloudflared is installed (${status.version}) at ${status.path}`, 'success');
+    } else {
+      showToast(`⚠️ cloudflared not found. Install via 'pkg install cloudflared' (Termux) or 'brew install cloudflared' (macOS).`, 'info');
+    }
+  } catch (err) {
+    showToast(`Failed to check cloudflared: ${err.message}`, 'error');
+  }
+}
+
+// Wire Cloudflare Tunnel UI Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Topbar + Section open modal buttons
+  const btnTop = document.getElementById('btnConfigureTunnelTop');
+  const btnOpen = document.getElementById('btnOpenConfigureTunnelModal');
+  if (btnTop) btnTop.addEventListener('click', () => openTunnelModal());
+  if (btnOpen) btnOpen.addEventListener('click', () => openTunnelModal());
+
+  // Close modals
+  const closeTunnel = document.getElementById('closeTunnelModal');
+  const cancelTunnel = document.getElementById('cancelTunnelModal');
+  if (closeTunnel) closeTunnel.addEventListener('click', () => document.getElementById('tunnelModal').classList.remove('active'));
+  if (cancelTunnel) cancelTunnel.addEventListener('click', () => document.getElementById('tunnelModal').classList.remove('active'));
+
+  // Target Source toggle
+  const btnSrcApp = document.getElementById('btnSourceApp');
+  const btnSrcCustom = document.getElementById('btnSourceCustom');
+  if (btnSrcApp) btnSrcApp.addEventListener('click', () => setTunnelTargetSource('app'));
+  if (btnSrcCustom) btnSrcCustom.addEventListener('click', () => setTunnelTargetSource('custom'));
+
+  // Mode Cards toggle
+  const cardQuick = document.getElementById('cardModeQuick');
+  const cardToken = document.getElementById('cardModeToken');
+  if (cardQuick) cardQuick.addEventListener('click', () => setTunnelMode('quick'));
+  if (cardToken) cardToken.addEventListener('click', () => setTunnelMode('token'));
+
+  // Target select change auto-updates default tunnel name
+  const targetSelect = document.getElementById('tunnelTargetSelect');
+  if (targetSelect) {
+    targetSelect.addEventListener('change', () => {
+      const opt = targetSelect.selectedOptions[0];
+      const nameInput = document.getElementById('tunnelNameInput');
+      if (opt && nameInput && !nameInput.value.includes('custom')) {
+        const appName = opt.getAttribute('data-app-name') || '';
+        if (appName) {
+          nameInput.value = `${appName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-tunnel`;
+        }
+      }
+    });
+  }
+
+  // Form submit
+  const form = document.getElementById('tunnelForm');
+  if (form) form.addEventListener('submit', submitCreateTunnel);
+
+  // Logs modal controls
+  const closeLogs = document.getElementById('closeTunnelLogsModal');
+  if (closeLogs) closeLogs.addEventListener('click', closeTunnelLogs);
+
+  const btnCopyLogs = document.getElementById('btnCopyTunnelLogs');
+  if (btnCopyLogs) {
+    btnCopyLogs.addEventListener('click', () => {
+      const content = document.getElementById('tunnelLogsContent');
+      if (content) {
+        navigator.clipboard.writeText(content.textContent).then(() => {
+          showToast('Diagnostic logs copied to clipboard!', 'success');
+        });
+      }
+    });
+  }
+
+  const btnRefreshLogs = document.getElementById('btnRefreshTunnelLogs');
+  if (btnRefreshLogs) btnRefreshLogs.addEventListener('click', refreshTunnelLogs);
+
+  const btnCopyLogsPublic = document.getElementById('btnCopyLogsPublicURL');
+  if (btnCopyLogsPublic) {
+    btnCopyLogsPublic.addEventListener('click', () => {
+      const publicLink = document.getElementById('tunnelLogsPublicLink');
+      if (publicLink && publicLink.textContent) {
+        copyTunnelURL(publicLink.textContent, btnCopyLogsPublic);
+      }
+    });
+  }
+
+  // Filter Buttons
+  const filterBtns = document.querySelectorAll('[data-tunnel-filter]');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentTunnelFilter = btn.getAttribute('data-tunnel-filter');
+      updateTunnelFilterButtons();
+      renderTunnels();
+    });
+  });
+
+  // Check binary button
+  const btnCheck = document.getElementById('btnCheckCloudflared');
+  if (btnCheck) btnCheck.addEventListener('click', checkCloudflaredBinary);
+});
+
 

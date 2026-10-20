@@ -617,5 +617,74 @@ func TestNetworksAPI(t *testing.T) {
 	}
 }
 
+func TestTunnelsAPI(t *testing.T) {
+	server, cleanup := setupTestServer(t)
+	defer cleanup()
+
+	// 1. Check tunnel status endpoint
+	reqStatus := httptest.NewRequest(http.MethodGet, "/api/tunnels/status", nil)
+	recStatus := httptest.NewRecorder()
+	server.mux.ServeHTTP(recStatus, reqStatus)
+	if recStatus.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for /api/tunnels/status, got %d", recStatus.Code)
+	}
+
+	// 2. Discover targets
+	reqTargets := httptest.NewRequest(http.MethodGet, "/api/tunnels/targets", nil)
+	recTargets := httptest.NewRecorder()
+	server.mux.ServeHTTP(recTargets, reqTargets)
+	if recTargets.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for /api/tunnels/targets, got %d", recTargets.Code)
+	}
+
+	// 3. Create tunnel without auto-start
+	createPayload := `{"name":"api-tunnel","target":"8080","target_port":8080,"mode":"quick","auto_start":false}`
+	reqCreate := httptest.NewRequest(http.MethodPost, "/api/tunnels", strings.NewReader(createPayload))
+	reqCreate.Header.Set("Content-Type", "application/json")
+	recCreate := httptest.NewRecorder()
+	server.mux.ServeHTTP(recCreate, reqCreate)
+	if recCreate.Code != http.StatusCreated {
+		t.Fatalf("expected 201 Created for /api/tunnels, got %d: %s", recCreate.Code, recCreate.Body.String())
+	}
+
+	var created struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+		Mode string `json:"mode"`
+		Port int    `json:"target_port"`
+	}
+	if err := json.NewDecoder(recCreate.Body).Decode(&created); err != nil {
+		t.Fatalf("failed to decode created tunnel: %v", err)
+	}
+	if created.ID == "" || created.Name != "api-tunnel" || created.Port != 8080 {
+		t.Fatalf("unexpected tunnel properties: %+v", created)
+	}
+
+	// 4. List tunnels
+	reqList := httptest.NewRequest(http.MethodGet, "/api/tunnels", nil)
+	recList := httptest.NewRecorder()
+	server.mux.ServeHTTP(recList, reqList)
+	if recList.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for /api/tunnels, got %d", recList.Code)
+	}
+
+	// 5. Get tunnel by ID
+	reqGet := httptest.NewRequest(http.MethodGet, "/api/tunnels/"+created.ID, nil)
+	recGet := httptest.NewRecorder()
+	server.mux.ServeHTTP(recGet, reqGet)
+	if recGet.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for get tunnel, got %d", recGet.Code)
+	}
+
+	// 6. Delete tunnel
+	reqDel := httptest.NewRequest(http.MethodDelete, "/api/tunnels/"+created.ID, nil)
+	recDel := httptest.NewRecorder()
+	server.mux.ServeHTTP(recDel, reqDel)
+	if recDel.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK for delete tunnel, got %d", recDel.Code)
+	}
+}
+
+
 
 

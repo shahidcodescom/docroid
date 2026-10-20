@@ -31,6 +31,7 @@ import (
 	"docroid/pkg/secrets"
 	"docroid/pkg/staticsite"
 	"docroid/pkg/supervisor"
+	"docroid/pkg/tunnel"
 	"docroid/pkg/utils"
 	"docroid/pkg/web"
 )
@@ -77,6 +78,9 @@ func main() {
 		defer clusterMgr.Stop()
 	}
 
+	tunnelStore, _ := tunnel.NewStore(store.BaseDir())
+	tunnelMgr := tunnel.NewManager(tunnelStore)
+
 	// Register stop hook to cleanly terminate in-process and background supervisors/proxies
 	app.RegisterStopHook(func(appID string) {
 		supervisor.GetSupervisor().Cancel(appID)
@@ -110,6 +114,8 @@ func main() {
 		handleSecret(store, os.Args[2:])
 	case "network", "net":
 		handleNetwork(store, os.Args[2:])
+	case "tunnel", "tunnels", "cf-tunnel", "cloudflare":
+		handleTunnel(tunnelMgr, manager, store, os.Args[2:])
 	case "_supervise":
 		handleSupervise(manager, os.Args[2:])
 	case "build":
@@ -188,6 +194,10 @@ func printUsage() {
 	fmt.Println()
 	fmt.Println("Networking & Inter-Container Communication:")
 	fmt.Println("  network   Manage virtual container networks (create, ls, inspect, rm, connect, disconnect)")
+	fmt.Println()
+	fmt.Println("Cloudflare Tunnels (Remote Port Access & Exposure):")
+	fmt.Println("  tunnel    Expose any local port or container to the world via Cloudflare Tunnel")
+	fmt.Println("            (docroid tunnel start, ls, stop, restart, rm, logs, status)")
 	fmt.Println()
 	fmt.Println("Image & Packaging Commands (Portability):")
 	fmt.Println("  build     Build a portable image from a Docroidfile or Dockerfile (docroid build -t myapp .)")
@@ -2669,3 +2679,310 @@ func contains(slice []string, val string) bool {
 	}
 	return false
 }
+
+func handleTunnel(tunnelMgr *tunnel.Manager, manager *app.AppManager, store *app.Store, args []string) {
+	if len(args) == 0 {
+		fmt.Println("Usage: docroid tunnel <command> [arguments...]")
+		fmt.Println()
+		fmt.Println("Commands:")
+		fmt.Println("  start     Connect any port or Docroid app through Cloudflare Tunnel (docroid tunnel start -p 8080)")
+		fmt.Println("  ls        List all configured tunnels with live status and public URLs")
+		fmt.Println("  stop      Stop an active tunnel (docroid tunnel stop <id|name>)")
+		fmt.Println("  restart   Restart a tunnel (docroid tunnel restart <id|name>)")
+		fmt.Println("  rm        Delete a tunnel configuration (docroid tunnel rm <id|name>)")
+		fmt.Println("  logs      View real-time or recent logs for a tunnel (docroid tunnel logs <id|name>)")
+		fmt.Println("  status    Inspect system cloudflared binary installation and health")
+		fmt.Println()
+		fmt.Println("Examples:")
+		fmt.Println("  docroid tunnel start -p 8080                    # Direct quick tunnel exposing port 8080")
+		fmt.Println("  docroid tunnel start --app quote-service -d     # Expose Docroid container in background")
+		fmt.Println("  docroid tunnel start -p 3000 --token <CF_TOKEN> # Zero Trust named tunnel")
+		fmt.Println("  docroid tunnel ls                               # List active tunnels and public URLs")
+		return
+	}
+
+	subcmd := args[0]
+	subargs := args[1:]
+
+	switch subcmd {
+	case "start", "run":
+		fs := flag.NewFlagSet("tunnel start", flag.ExitOnError)
+		port := fs.Int("p", 0, "Target port to expose (e.g. 8080)")
+		target := fs.String("t", "", "Target URL or address (e.g. 8080, 127.0.0.1:8080, http://localhost:3000)")
+		appName := fs.String("app", "", "Name or ID of running Docroid app to expose")
+		name := fs.String("n", "", "Friendly name for this tunnel")
+		token := fs.String("token", "", "Cloudflare Zero Trust Tunnel token")
+		hostname := fs.String("hostname", "", "Custom hostname (for Cloudflare DNS)")
+		detach := fs.Bool("d", false, "Run tunnel in background (detached)")
+		autoRestart := fs.Bool("restart", false, "Automatically restart tunnel if cloudflared crashes")
+		_ = fs.Parse(subargs)
+
+		targetPort := *port
+		targetStr := *target
+		var appID string
+		resolvedAppName := *appName
+
+		if resolvedAppName != "" {
+			appInst, err := store.FindApp(resolvedAppName)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: app '%s' not found: %v\n", resolvedAppName, err)
+				os.Exit(1)
+			}
+			appID = appInst.ID
+			resolvedAppName = appInst.Name
+			if targetPort == 0 && targetStr == "" {
+				if appInst.Port > 0 {
+					targetPort = appInst.Port
+				} else if appInst.PortMapping != "" {
+					if pm, err := netproxy.ParsePortMapping(appInst.PortMapping); err == nil {
+						targetPort = pm.HostPort
+					}
+				}
+			}
+		}
+
+		if targetPort == 0 && targetStr == "" && len(fs.Args()) > 0 {
+			targetStr = fs.Args()[0]
+		}
+
+		mode := tunnel.ModeQuick
+		if *token != "" {
+			mode = tunnel.ModeToken
+		}
+
+		opts := tunnel.TunnelOptions{
+			Name:        *name,
+			AppID:       appID,
+			AppName:     resolvedAppName,
+			Target:      targetStr,
+			TargetPort:  targetPort,
+			Mode:        mode,
+			Token:       *token,
+			Hostname:    *hostname,
+			AutoRestart: *autoRestart,
+		}
+
+		tun, err := tunnelMgr.CreateTunnel(opts)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error configuring tunnel: %v\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("Starting Cloudflare Tunnel '%s' for target %s...\n", tun.Name, tun.Target)
+
+		tun, err = tunnelMgr.Start(tun.ID)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error starting tunnel: %v\n", err)
+			os.Exit(1)
+		}
+
+		if *detach {
+			fmt.Println("Connecting to Cloudflare edge network in background...")
+			foundURL := ""
+			for i := 0; i < 12; i++ {
+				time.Sleep(500 * time.Millisecond)
+				if cur, err := tunnelMgr.Store().GetTunnel(tun.ID); err == nil && cur.PublicURL != "" {
+					foundURL = cur.PublicURL
+					tun = cur
+					break
+				}
+			}
+
+			fmt.Println()
+			fmt.Printf("✓ Tunnel '%s' (ID: %s) is running (PID: %d)\n", tun.Name, tun.ID, tun.PID)
+			fmt.Printf("• Local Target: %s\n", tun.Target)
+			if foundURL != "" {
+				fmt.Printf("• Public URL:   %s\n", foundURL)
+			} else if tun.Mode == tunnel.ModeToken {
+				fmt.Println("• Cloudflare Zero Trust: Remote route active")
+			} else {
+				fmt.Printf("• Public URL:   Establishing connection (run 'docroid tunnel ls' in a few seconds)\n")
+			}
+			fmt.Println()
+			fmt.Printf("View logs: docroid tunnel logs %s\n", tun.ID)
+			fmt.Printf("Stop:      docroid tunnel stop %s\n", tun.ID)
+			return
+		}
+
+		// Foreground mode
+		fmt.Println("Connecting to Cloudflare edge network...")
+		fmt.Println("Press Ctrl+C to disconnect.")
+		fmt.Println()
+
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+		urlPrinted := false
+		ticker := time.NewTicker(500 * time.Millisecond)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-sigChan:
+				fmt.Println("\nStopping Cloudflare Tunnel...")
+				_, _ = tunnelMgr.Stop(tun.ID)
+				fmt.Println("✓ Tunnel disconnected.")
+				return
+			case <-ticker.C:
+				cur, err := tunnelMgr.Store().GetTunnel(tun.ID)
+				if err != nil {
+					return
+				}
+				if !urlPrinted && cur.PublicURL != "" {
+					urlPrinted = true
+					fmt.Println("=================================================================")
+					fmt.Printf("✓ PUBLIC CLOUDFLARE URL: %s\n", cur.PublicURL)
+					fmt.Println("=================================================================")
+					fmt.Printf("Routing directly to: %s\n", cur.Target)
+					fmt.Println("Press Ctrl+C to close the tunnel.")
+				}
+				if cur.Status == tunnel.StatusStopped || cur.Status == tunnel.StatusError {
+					if cur.LastError != "" {
+						fmt.Fprintf(os.Stderr, "Tunnel exited: %s\n", cur.LastError)
+					} else {
+						fmt.Println("Tunnel stopped.")
+					}
+					return
+				}
+			}
+		}
+
+	case "ls", "list":
+		tunnels, err := tunnelMgr.Store().ListTunnels()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error listing tunnels: %v\n", err)
+			os.Exit(1)
+		}
+
+		if len(tunnels) == 0 {
+			fmt.Println("No Cloudflare tunnels configured. Run 'docroid tunnel start -p <port>' or configure in Web UI.")
+			return
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+		fmt.Fprintln(w, "ID\tNAME\tMODE\tTARGET\tPUBLIC URL\tSTATUS\tPID\tCREATED")
+		for _, t := range tunnels {
+			pub := t.PublicURL
+			if pub == "" {
+				if t.Mode == tunnel.ModeToken {
+					pub = "(zero trust)"
+				} else if t.Status == tunnel.StatusStarting {
+					pub = "(connecting...)"
+				} else {
+					pub = "-"
+				}
+			}
+			pidStr := "-"
+			if t.PID > 0 {
+				pidStr = strconv.Itoa(t.PID)
+			}
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+				t.ID,
+				t.Name,
+				t.Mode,
+				t.Target,
+				pub,
+				t.Status,
+				pidStr,
+				t.CreatedAt.Format("01/02 15:04"),
+			)
+		}
+		_ = w.Flush()
+
+	case "stop":
+		if len(subargs) == 0 {
+			fmt.Println("Usage: docroid tunnel stop <id|name>")
+			os.Exit(1)
+		}
+		t, err := tunnelMgr.Store().FindTunnel(subargs[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if _, err := tunnelMgr.Stop(t.ID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error stopping tunnel: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("✓ Tunnel '%s' (%s) stopped.\n", t.Name, t.ID)
+
+	case "restart":
+		if len(subargs) == 0 {
+			fmt.Println("Usage: docroid tunnel restart <id|name>")
+			os.Exit(1)
+		}
+		t, err := tunnelMgr.Store().FindTunnel(subargs[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Restarting tunnel '%s' (%s)...\n", t.Name, t.ID)
+		if _, err := tunnelMgr.Restart(t.ID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error restarting tunnel: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("✓ Tunnel '%s' restarted.\n", t.Name)
+
+	case "rm", "remove", "delete":
+		if len(subargs) == 0 {
+			fmt.Println("Usage: docroid tunnel rm <id|name>")
+			os.Exit(1)
+		}
+		t, err := tunnelMgr.Store().FindTunnel(subargs[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := tunnelMgr.Delete(t.ID); err != nil {
+			fmt.Fprintf(os.Stderr, "Error deleting tunnel: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("✓ Tunnel '%s' (%s) removed.\n", t.Name, t.ID)
+
+	case "logs":
+		if len(subargs) == 0 {
+			fmt.Println("Usage: docroid tunnel logs <id|name> [-n lines]")
+			os.Exit(1)
+		}
+		fs := flag.NewFlagSet("tunnel logs", flag.ExitOnError)
+		lines := fs.Int("n", 50, "Number of lines to show")
+		_ = fs.Parse(subargs[1:])
+
+		t, err := tunnelMgr.Store().FindTunnel(subargs[0])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
+		logs, err := tunnelMgr.GetLogs(t.ID, *lines)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error retrieving logs: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println(logs)
+
+	case "status", "check":
+		info := tunnel.GetCloudflaredInfo()
+		fmt.Println("Cloudflare Tunnel Integration Status:")
+		fmt.Println("=====================================")
+		if info.Installed {
+			fmt.Printf("• Binary:    Installed (%s)\n", info.Path)
+			fmt.Printf("• Version:   %s\n", info.Version)
+			tunnels, _ := tunnelMgr.Store().ListTunnels()
+			active := 0
+			for _, tun := range tunnels {
+				if tun.Status == tunnel.StatusRunning || tun.Status == tunnel.StatusStarting {
+					active++
+				}
+			}
+			fmt.Printf("• Tunnels:   %d total (%d active)\n", len(tunnels), active)
+		} else {
+			fmt.Println("• Binary:    Not found")
+			fmt.Printf("• Note:      %s\n", info.Error)
+		}
+
+	default:
+		fmt.Fprintf(os.Stderr, "Unknown tunnel command '%s'. Run 'docroid tunnel' for usage.\n", subcmd)
+		os.Exit(1)
+	}
+}
+

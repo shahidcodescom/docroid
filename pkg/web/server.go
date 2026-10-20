@@ -31,29 +31,36 @@ import (
 	"docroid/pkg/secrets"
 	"docroid/pkg/staticsite"
 	"docroid/pkg/supervisor"
+	"docroid/pkg/tunnel"
 	"docroid/pkg/utils"
 )
 
 type Server struct {
-	manager    *app.AppManager
-	rootfsMgr  *rootfs.Manager
-	siteStore  *staticsite.Store
-	clusterMgr *cluster.Manager
-	netMgr     *network.NetworkManager
-	mux        *http.ServeMux
+	manager       *app.AppManager
+	rootfsMgr     *rootfs.Manager
+	siteStore     *staticsite.Store
+	clusterMgr    *cluster.Manager
+	netMgr        *network.NetworkManager
+	tunnelMgr     *tunnel.Manager
+	dashboardPort int
+	mux           *http.ServeMux
 }
 
 func NewServer(manager *app.AppManager, rootfsMgr *rootfs.Manager) *Server {
 	siteStore, _ := staticsite.NewStore(manager.Store().BaseDir())
 	clusterMgr, _ := cluster.NewManager(manager.Store(), manager)
 	netMgr, _ := network.NewNetworkManager(manager.Store().BaseDir())
+	tunnelStore, _ := tunnel.NewStore(manager.Store().BaseDir())
+	tunnelMgr := tunnel.NewManager(tunnelStore)
 	s := &Server{
-		manager:    manager,
-		rootfsMgr:  rootfsMgr,
-		siteStore:  siteStore,
-		clusterMgr: clusterMgr,
-		netMgr:     netMgr,
-		mux:        http.NewServeMux(),
+		manager:       manager,
+		rootfsMgr:     rootfsMgr,
+		siteStore:     siteStore,
+		clusterMgr:    clusterMgr,
+		netMgr:        netMgr,
+		tunnelMgr:     tunnelMgr,
+		dashboardPort: 9090,
+		mux:           http.NewServeMux(),
 	}
 
 	app.RegisterStopHook(func(appID string) {
@@ -71,6 +78,14 @@ func (s *Server) ClusterManager() *cluster.Manager {
 
 func (s *Server) SetClusterManager(cm *cluster.Manager) {
 	s.clusterMgr = cm
+}
+
+func (s *Server) TunnelManager() *tunnel.Manager {
+	return s.tunnelMgr
+}
+
+func (s *Server) SetDashboardPort(port int) {
+	s.dashboardPort = port
 }
 
 func (s *Server) registerRoutes() {
@@ -96,6 +111,12 @@ func (s *Server) registerRoutes() {
 	// Virtual Networks API routes
 	s.mux.HandleFunc("/api/networks", s.handleNetworks)
 	s.mux.HandleFunc("/api/networks/", s.handleNetworkDetail)
+
+	// Cloudflare Tunnel API routes
+	s.mux.HandleFunc("/api/tunnels/status", s.handleTunnelStatus)
+	s.mux.HandleFunc("/api/tunnels/targets", s.handleTunnelTargets)
+	s.mux.HandleFunc("/api/tunnels", s.handleTunnels)
+	s.mux.HandleFunc("/api/tunnels/", s.handleTunnelDetail)
 
 	// Cluster & Pods API routes
 	s.mux.HandleFunc("/api/cluster/status", s.handleClusterStatus)
@@ -1247,6 +1268,7 @@ func StartServer(manager *app.AppManager, rootfsMgr *rootfs.Manager, host string
 
 	addr := fmt.Sprintf("%s:%d", host, port)
 	server := NewServer(manager, rootfsMgr)
+	server.SetDashboardPort(port)
 
 	fmt.Printf("\nDocroid Web Dashboard & Management Server\n")
 	fmt.Printf("==========================================\n")
@@ -2220,4 +2242,255 @@ func contains(slice []string, item string) bool {
 	}
 	return false
 }
+
+// Cloudflare Tunnel API Handlers
+
+func (s *Server) handleTunnelStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+	info := tunnel.GetCloudflaredInfo()
+	_ = json.NewEncoder(w).Encode(info)
+}
+
+func (s *Server) handleTunnelTargets(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
+
+	var appsList []struct {
+		ID     string
+		Name   string
+		Port   int
+		Status string
+	}
+	if apps, err := s.manager.ListAppsWithStats(); err == nil {
+		for _, item := range apps {
+			p := item.App.Port
+			if p == 0 && item.App.PortMapping != "" {
+				if pm, err := netproxy.ParsePortMapping(item.App.PortMapping); err == nil {
+					p = pm.HostPort
+				}
+			}
+			appsList = append(appsList, struct {
+				ID     string
+				Name   string
+				Port   int
+				Status string
+			}{
+				ID:     item.App.ID,
+				Name:   item.App.Name,
+				Port:   p,
+				Status: string(item.App.Status),
+			})
+		}
+	}
+
+	var sitesList []struct {
+		ID     string
+		Name   string
+		Port   int
+		Status string
+	}
+	if sites, err := s.siteStore.ListSites(); err == nil {
+		for _, site := range sites {
+			st := "stopped"
+			if staticsite.IsSiteRunning(site, s.siteStore) {
+				st = "running"
+			}
+			sitesList = append(sitesList, struct {
+				ID     string
+				Name   string
+				Port   int
+				Status string
+			}{
+				ID:     site.ID,
+				Name:   site.Name,
+				Port:   site.Port,
+				Status: st,
+			})
+		}
+	}
+
+	targets := s.tunnelMgr.DiscoverTargets(appsList, sitesList, s.dashboardPort)
+	_ = json.NewEncoder(w).Encode(targets)
+}
+
+func (s *Server) handleTunnels(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	switch r.Method {
+	case http.MethodGet:
+		tunnels, err := s.tunnelMgr.Store().ListTunnels()
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(tunnels)
+
+	case http.MethodPost:
+		var req struct {
+			Name        string            `json:"name"`
+			AppID       string            `json:"app_id"`
+			AppName     string            `json:"app_name"`
+			Target      string            `json:"target"`
+			TargetPort  int               `json:"target_port"`
+			Mode        tunnel.TunnelMode `json:"mode"`
+			Token       string            `json:"token"`
+			Hostname    string            `json:"hostname"`
+			AutoRestart bool              `json:"auto_restart"`
+			AutoStart   *bool             `json:"auto_start"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"invalid JSON: %s"}`, err.Error()), http.StatusBadRequest)
+			return
+		}
+
+		opts := tunnel.TunnelOptions{
+			Name:        req.Name,
+			AppID:       req.AppID,
+			AppName:     req.AppName,
+			Target:      req.Target,
+			TargetPort:  req.TargetPort,
+			Mode:        req.Mode,
+			Token:       req.Token,
+			Hostname:    req.Hostname,
+			AutoRestart: req.AutoRestart,
+		}
+
+		tun, err := s.tunnelMgr.CreateTunnel(opts)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusBadRequest)
+			return
+		}
+
+		autoStart := true
+		if req.AutoStart != nil {
+			autoStart = *req.AutoStart
+		}
+
+		if autoStart {
+			if started, err := s.tunnelMgr.Start(tun.ID); err == nil {
+				tun = started
+			} else {
+				tun, _ = s.tunnelMgr.Store().GetTunnel(tun.ID)
+			}
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(tun)
+
+	default:
+		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+	}
+}
+
+func (s *Server) handleTunnelDetail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	path := strings.TrimPrefix(r.URL.Path, "/api/tunnels/")
+	parts := strings.Split(strings.Trim(path, "/"), "/")
+	if len(parts) == 0 || parts[0] == "" {
+		http.Error(w, `{"error":"tunnel id required"}`, http.StatusBadRequest)
+		return
+	}
+
+	tunnelID := parts[0]
+
+	if len(parts) >= 2 {
+		action := parts[1]
+		switch action {
+		case "start":
+			if r.Method != http.MethodPost {
+				http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+				return
+			}
+			tun, err := s.tunnelMgr.Start(tunnelID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+				return
+			}
+			_ = json.NewEncoder(w).Encode(tun)
+			return
+
+		case "stop":
+			if r.Method != http.MethodPost {
+				http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+				return
+			}
+			tun, err := s.tunnelMgr.Stop(tunnelID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+				return
+			}
+			_ = json.NewEncoder(w).Encode(tun)
+			return
+
+		case "restart":
+			if r.Method != http.MethodPost {
+				http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+				return
+			}
+			tun, err := s.tunnelMgr.Restart(tunnelID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+				return
+			}
+			_ = json.NewEncoder(w).Encode(tun)
+			return
+
+		case "logs":
+			if r.Method != http.MethodGet {
+				http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+				return
+			}
+			lines := 100
+			if lStr := r.URL.Query().Get("lines"); lStr != "" {
+				if parsedL, err := strconv.Atoi(lStr); err == nil && parsedL > 0 {
+					lines = parsedL
+				}
+			}
+			logs, err := s.tunnelMgr.GetLogs(tunnelID, lines)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+				return
+			}
+			_ = json.NewEncoder(w).Encode(map[string]string{
+				"id":   tunnelID,
+				"logs": logs,
+			})
+			return
+
+		default:
+			http.Error(w, `{"error":"unknown tunnel action"}`, http.StatusNotFound)
+			return
+		}
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		tun, err := s.tunnelMgr.Store().GetTunnel(tunnelID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusNotFound)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(tun)
+
+	case http.MethodDelete:
+		if err := s.tunnelMgr.Delete(tunnelID); err != nil {
+			http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]bool{"success": true})
+
+	default:
+		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+	}
+}
+
 
