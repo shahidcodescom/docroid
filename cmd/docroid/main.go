@@ -2916,11 +2916,27 @@ func handleTunnel(tunnelMgr *tunnel.Manager, manager *app.AppManager, store *app
 			os.Exit(1)
 		}
 		fmt.Printf("Restarting tunnel '%s' (%s)...\n", t.Name, t.ID)
-		if _, err := tunnelMgr.Restart(t.ID); err != nil {
+		tun, err := tunnelMgr.Restart(t.ID)
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error restarting tunnel: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("✓ Tunnel '%s' restarted.\n", t.Name)
+		// Wait briefly for quick tunnel to acquire URL
+		foundURL := tun.PublicURL
+		if tun.Mode == tunnel.ModeQuick {
+			for i := 0; i < 20; i++ {
+				time.Sleep(300 * time.Millisecond)
+				if cur, err := tunnelMgr.Store().GetTunnel(tun.ID); err == nil && cur.PublicURL != "" {
+					foundURL = cur.PublicURL
+					tun = cur
+					break
+				}
+			}
+		}
+		fmt.Printf("✓ Tunnel '%s' restarted (PID: %d).\n", tun.Name, tun.PID)
+		if foundURL != "" {
+			fmt.Printf("• Public URL: %s\n", foundURL)
+		}
 
 	case "rm", "remove", "delete":
 		if len(subargs) == 0 {

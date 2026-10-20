@@ -2,6 +2,7 @@ package tunnel
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -203,8 +204,17 @@ func (m *Manager) Start(tunnelID string) (*Tunnel, error) {
 	if t.Mode == ModeToken {
 		args = []string{"tunnel", "run", "--token", t.Token, "--no-autoupdate"}
 	} else {
-		// Quick tunnel
-		args = []string{"tunnel", "--url", t.Target, "--no-autoupdate"}
+		// Quick tunnel: provide an empty config file so cloudflared doesn't read ~/.cloudflared/config.yml
+		emptyCfg := filepath.Join(m.store.BaseDir(), "empty-config.yml")
+		if _, err := os.Stat(emptyCfg); os.IsNotExist(err) {
+			_ = os.WriteFile(emptyCfg, []byte("# docroid isolated tunnel config\n"), 0644)
+		}
+		args = []string{"tunnel", "--config", emptyCfg, "--url", t.Target, "--no-autoupdate"}
+
+		// Forward target host header so origin local servers / vhosts accept requests
+		if u, err := url.Parse(t.Target); err == nil && u.Host != "" {
+			args = append(args, "--http-host-header", u.Host)
+		}
 		if t.Hostname != "" {
 			args = append(args, "--hostname", t.Hostname)
 		}
@@ -242,6 +252,9 @@ func (m *Manager) Start(tunnelID string) (*Tunnel, error) {
 	t.Status = StatusStarting
 	t.StartedAt = time.Now()
 	t.LastError = ""
+	if t.Mode == ModeQuick {
+		t.PublicURL = ""
+	}
 	_ = m.store.SaveTunnel(t)
 
 	m.activeCmds[t.ID] = cmd
@@ -262,7 +275,7 @@ func (m *Manager) Start(tunnelID string) (*Tunnel, error) {
 				case <-ticker.C:
 					data, err := os.ReadFile(m.store.LogPath(tunID))
 					if err == nil {
-						content := string(data)
+						content := extractLatestSessionLog(tunID, string(data))
 						if t.Mode == ModeQuick {
 							if u := ExtractPublicURL(content); u != "" {
 								m.mu.Lock()
@@ -417,14 +430,18 @@ func (m *Manager) SyncProcesses() {
 
 	for _, t := range tunnels {
 		if t.PID > 0 && isPIDAlive(t.PID) {
-			if t.PublicURL == "" && t.Mode == ModeQuick {
+			if t.Mode == ModeQuick {
 				if data, err := os.ReadFile(m.store.LogPath(t.ID)); err == nil {
-					if u := ExtractPublicURL(string(data)); u != "" {
+					content := extractLatestSessionLog(t.ID, string(data))
+					if u := ExtractPublicURL(content); u != "" {
 						t.PublicURL = u
 						t.Status = StatusRunning
 						_ = m.store.SaveTunnel(t)
 					}
 				}
+			} else if t.Mode == ModeToken {
+				t.Status = StatusRunning
+				_ = m.store.SaveTunnel(t)
 			}
 		} else if t.Status == StatusRunning || t.Status == StatusStarting {
 			t.Status = StatusStopped
@@ -433,6 +450,15 @@ func (m *Manager) SyncProcesses() {
 			_ = m.store.SaveTunnel(t)
 		}
 	}
+}
+
+// extractLatestSessionLog isolates the log output from the most recent tunnel invocation
+func extractLatestSessionLog(tunID, fullLog string) string {
+	markerPrefix := fmt.Sprintf("--- Tunnel %s starting at", tunID)
+	if idx := strings.LastIndex(fullLog, markerPrefix); idx != -1 {
+		return fullLog[idx:]
+	}
+	return fullLog
 }
 
 // StopAll terminates all running tunnels (called on server shutdown)
