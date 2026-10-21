@@ -11,10 +11,12 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"docroid/pkg/app"
@@ -1270,19 +1272,69 @@ func StartServer(manager *app.AppManager, rootfsMgr *rootfs.Manager, host string
 	server := NewServer(manager, rootfsMgr)
 	server.SetDashboardPort(port)
 
+	baseDir := manager.Store().BaseDir()
+	pidPath := filepath.Join(baseDir, "ui.pid")
+	jsonPath := filepath.Join(baseDir, "ui.json")
+
+	pid := os.Getpid()
+	_ = os.WriteFile(pidPath, []byte(strconv.Itoa(pid)), 0644)
+
+	meta := map[string]interface{}{
+		"pid":        pid,
+		"port":       port,
+		"host":       host,
+		"started_at": time.Now().Format(time.RFC3339),
+	}
+	if data, err := json.MarshalIndent(meta, "", "  "); err == nil {
+		_ = os.WriteFile(jsonPath, data, 0644)
+	}
+
+	defer func() {
+		_ = os.Remove(pidPath)
+		_ = os.Remove(jsonPath)
+	}()
+
 	fmt.Printf("\nDocroid Web Dashboard & Management Server\n")
 	fmt.Printf("==========================================\n")
 	fmt.Printf("• Local access:   http://localhost:%d\n", port)
 
 	// Print LAN IP addresses for easy connection from other devices (e.g. laptop)
-	if ips := getLocalIPs(); len(ips) > 0 {
+	if ips := GetLocalIPs(); len(ips) > 0 {
 		for _, ip := range ips {
 			fmt.Printf("• Network access: http://%s:%d\n", ip, port)
 		}
 	}
 	fmt.Printf("\nPress Ctrl+C to stop the dashboard server.\n\n")
 
-	return http.ListenAndServe(addr, server.mux)
+	httpServer := &http.Server{
+		Addr:    addr,
+		Handler: server.mux,
+	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	errChan := make(chan error, 1)
+	go func() {
+		errChan <- httpServer.ListenAndServe()
+	}()
+
+	select {
+	case <-sigChan:
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		return httpServer.Shutdown(ctx)
+	case err := <-errChan:
+		if err == http.ErrServerClosed {
+			return nil
+		}
+		return err
+	}
+}
+
+// GetLocalIPs returns non-loopback IPv4 addresses of local network interfaces
+func GetLocalIPs() []string {
+	return getLocalIPs()
 }
 
 func getLocalIPs() []string {
@@ -1520,11 +1572,17 @@ func (s *Server) handleSites(w http.ResponseWriter, r *http.Request) {
 
 		// Auto-start if requested
 		if autoStart {
-			if err := staticsite.StartInProcessServer(createdSite.Port, s.siteStore); err == nil {
-				createdSite.Status = staticsite.StatusRunning
-				createdSite.PID = os.Getpid()
-				createdSite.StartedAt = time.Now()
-				_ = s.siteStore.SaveSite(createdSite)
+			if err := staticsite.StartSiteProcess(createdSite.ID, s.siteStore); err != nil {
+				if inProcErr := staticsite.StartInProcessServer(createdSite.Port, s.siteStore); inProcErr == nil {
+					createdSite.Status = staticsite.StatusRunning
+					createdSite.PID = os.Getpid()
+					createdSite.StartedAt = time.Now()
+					_ = s.siteStore.SaveSite(createdSite)
+				}
+			} else {
+				if refreshed, err := s.siteStore.LoadSite(createdSite.ID); err == nil {
+					createdSite = refreshed
+				}
 			}
 		}
 
@@ -1570,14 +1628,20 @@ func (s *Server) handleSiteDetail(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, `{"error":"POST required"}`, http.StatusMethodNotAllowed)
 			return
 		}
-		if err := staticsite.StartInProcessServer(site.Port, s.siteStore); err != nil {
-			http.Error(w, fmt.Sprintf(`{"error":"failed to start server on port %d: %s"}`, site.Port, err.Error()), http.StatusInternalServerError)
-			return
+		if err := staticsite.StartSiteProcess(site.ID, s.siteStore); err != nil {
+			if inProcErr := staticsite.StartInProcessServer(site.Port, s.siteStore); inProcErr != nil {
+				http.Error(w, fmt.Sprintf(`{"error":"failed to start server on port %d: %s"}`, site.Port, err.Error()), http.StatusInternalServerError)
+				return
+			}
+			site.Status = staticsite.StatusRunning
+			site.PID = os.Getpid()
+			site.StartedAt = time.Now()
+			_ = s.siteStore.SaveSite(site)
+		} else {
+			if refreshed, err := s.siteStore.LoadSite(site.ID); err == nil {
+				site = refreshed
+			}
 		}
-		site.Status = staticsite.StatusRunning
-		site.PID = os.Getpid()
-		site.StartedAt = time.Now()
-		_ = s.siteStore.SaveSite(site)
 		_ = json.NewEncoder(w).Encode(site)
 
 	case "stop":
@@ -1585,7 +1649,7 @@ func (s *Server) handleSiteDetail(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, `{"error":"POST required"}`, http.StatusMethodNotAllowed)
 			return
 		}
-		_ = staticsite.StopInProcessServer(site.Port)
+		_ = staticsite.StopInProcessServerForSite(site.Port, s.siteStore, site.ID)
 		_ = staticsite.StopSiteProcess(site.ID, s.siteStore)
 		site.Status = staticsite.StatusStopped
 		site.PID = 0
@@ -1693,7 +1757,7 @@ func (s *Server) handleSiteDetail(w http.ResponseWriter, r *http.Request) {
 			staticsite.IsSiteRunning(site, s.siteStore)
 			_ = json.NewEncoder(w).Encode(site)
 		} else if r.Method == http.MethodDelete {
-			_ = staticsite.StopInProcessServer(site.Port)
+			_ = staticsite.StopInProcessServerForSite(site.Port, s.siteStore, site.ID)
 			_ = staticsite.StopSiteProcess(site.ID, s.siteStore)
 			if err := s.siteStore.DeleteSite(site.ID); err != nil {
 				http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusInternalServerError)

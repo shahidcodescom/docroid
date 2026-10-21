@@ -288,3 +288,33 @@ func TestExportSiteZip(t *testing.T) {
 		t.Errorf("unexpected exported files: %+v", zr.File)
 	}
 }
+
+func TestStopSiteProcessDoesNotKillCurrentProcess(t *testing.T) {
+	store, cleanup := createTestStore(t)
+	defer cleanup()
+
+	site, err := store.CreateSite("safety-test", 8099, "", false, false)
+	if err != nil {
+		t.Fatalf("failed site: %v", err)
+	}
+
+	// Explicitly assign site PID to current process (which previously caused suicide)
+	site.PID = os.Getpid()
+	site.Status = StatusRunning
+	if err := store.SaveSite(site); err != nil {
+		t.Fatalf("failed to save site: %v", err)
+	}
+
+	// Stopping should complete safely without killing the test runner!
+	if err := StopSiteProcess(site.ID, store); err != nil {
+		t.Fatalf("StopSiteProcess failed: %v", err)
+	}
+
+	loaded, err := store.FindSite(site.ID)
+	if err != nil {
+		t.Fatalf("failed to reload site: %v", err)
+	}
+	if loaded.Status != StatusStopped || loaded.PID != 0 {
+		t.Errorf("expected site stopped and PID 0, got status=%s, pid=%d", loaded.Status, loaded.PID)
+	}
+}

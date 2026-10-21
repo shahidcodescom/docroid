@@ -51,6 +51,18 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 
 	// Build proot command arguments
 	var prootArgs []string
+	termuxTmp := "/data/data/com.termux/files/usr/tmp"
+	termuxTmpExists := false
+	if _, err := os.Stat(termuxTmp); err == nil {
+		termuxTmpExists = true
+	}
+
+	// On Termux / Android, use --link2symlink to emulate hardlinks with symlinks
+	// preventing package managers (apk, apt) from failing on Android storage.
+	if strings.Contains(e.prootPath, "com.termux") || termuxTmpExists {
+		prootArgs = append(prootArgs, "--link2symlink")
+	}
+
 	if cfg.User != "" {
 		prootArgs = append(prootArgs, "-i", cfg.User)
 	} else {
@@ -64,8 +76,7 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 	)
 
 	// Mount Termux tmp if present
-	termuxTmp := "/data/data/com.termux/files/usr/tmp"
-	if _, err := os.Stat(termuxTmp); err == nil {
+	if termuxTmpExists {
 		prootArgs = append(prootArgs, "-b", termuxTmp+":/tmp")
 	}
 
@@ -134,13 +145,6 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 		}
 	}
 
-	for k, v := range defaultEnvs {
-		prootArgs = append(prootArgs, "-E", fmt.Sprintf("%s=%s", k, v))
-	}
-	for k, v := range a.Env {
-		prootArgs = append(prootArgs, "-E", fmt.Sprintf("%s=%s", k, v))
-	}
-
 	// The command to run inside rootfs
 	cmdInside := a.Command
 	if cmdInside == "" {
@@ -150,6 +154,42 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 	prootArgs = append(prootArgs, a.Args...)
 
 	cmd := exec.Command(e.prootPath, prootArgs...)
+
+	// Construct clean environment for proot and the guest container process.
+	// Inherit safe host environment variables (like TERM, LANG, etc.),
+	// but filter out LD_PRELOAD, LD_LIBRARY_PATH, and host paths (PATH, HOME, USER, LOGNAME)
+	// so Termux libraries and host configurations don't interfere with rootfs binaries.
+	var cmdEnv []string
+	for _, envEntry := range os.Environ() {
+		parts := strings.SplitN(envEntry, "=", 2)
+		if len(parts) == 2 {
+			k := parts[0]
+			if strings.HasPrefix(k, "LD_") || k == "PATH" || k == "HOME" || k == "USER" || k == "LOGNAME" || k == "TMPDIR" {
+				continue
+			}
+			if _, exists := defaultEnvs[k]; exists {
+				continue
+			}
+			if _, exists := a.Env[k]; exists {
+				continue
+			}
+			cmdEnv = append(cmdEnv, envEntry)
+		}
+	}
+
+	for k, v := range defaultEnvs {
+		cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", k, v))
+	}
+	for k, v := range a.Env {
+		cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	if termuxTmpExists {
+		cmdEnv = append(cmdEnv, fmt.Sprintf("PROOT_TMP_DIR=%s", termuxTmp))
+	}
+
+	cmd.Env = cmdEnv
+
 	// Configure process group attributes for clean signal handling in background/detached mode.
 	// In interactive foreground mode, avoid Setpgid: true so the process stays in the foreground process group.
 	if !cfg.Interactive {

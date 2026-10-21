@@ -432,10 +432,27 @@ func StartInProcessServer(port int, store *Store) error {
 
 // StopInProcessServer shuts down an active in-process listener on a port
 func StopInProcessServer(port int) error {
+	return StopInProcessServerForSite(port, nil, "")
+}
+
+// StopInProcessServerForSite shuts down an active in-process listener on a port if no other running site requires it
+func StopInProcessServerForSite(port int, store *Store, excludeSiteID string) error {
 	activeServersMu.Lock()
+	defer activeServersMu.Unlock()
+
+	if store != nil {
+		if sites, err := store.ListSites(); err == nil {
+			for _, s := range sites {
+				if s.ID != excludeSiteID && s.Port == port && s.Status == StatusRunning {
+					// Another site is still running on this port, keep listener active
+					return nil
+				}
+			}
+		}
+	}
+
 	srv, exists := activeServers[port]
 	delete(activeServers, port)
-	activeServersMu.Unlock()
 
 	if exists && srv != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -479,6 +496,7 @@ func StartSiteProcess(siteID string, store *Store) error {
 	}
 
 	cmd := exec.Command(selfPath, "_static-serve", "--id", site.ID)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdin = nil
 	cmd.Stdout = nil
 	cmd.Stderr = nil
@@ -519,7 +537,8 @@ func StopSiteProcess(siteID string, store *Store) error {
 		}
 	}
 
-	if pid > 0 {
+	// CRITICAL GUARD: Never kill or signal our own process (e.g. if site ran in-process inside Web UI)
+	if pid > 0 && pid != os.Getpid() {
 		if proc, err := os.FindProcess(pid); err == nil {
 			_ = proc.Signal(syscall.SIGTERM)
 			_ = syscall.Kill(-pid, syscall.SIGTERM)
@@ -560,6 +579,21 @@ func IsSiteRunning(site *Site, store *Store) bool {
 			site.Status = StatusStopped
 			_ = store.SaveSite(site)
 		}
+		return false
+	}
+
+	// If marked with the current process PID (in-process web server)
+	if pid == os.Getpid() {
+		activeServersMu.Lock()
+		_, inProcess := activeServers[site.Port]
+		activeServersMu.Unlock()
+		if inProcess && site.Status == StatusRunning {
+			return true
+		}
+		site.Status = StatusStopped
+		site.PID = 0
+		_ = store.SaveSite(site)
+		_ = os.Remove(store.PidPath(site.ID))
 		return false
 	}
 

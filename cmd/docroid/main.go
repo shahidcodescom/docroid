@@ -209,7 +209,7 @@ func printUsage() {
 	fmt.Println("  rmi       Remove an installed image")
 	fmt.Println()
 	fmt.Println("Web Dashboard & System Commands:")
-	fmt.Println("  ui        Launch the built-in web management dashboard (default :9090)")
+	fmt.Println("  ui        Launch or manage web dashboard (-d detached, stop, status, logs)")
 	fmt.Println("  static    Host static HTML/assets or ZIP bundles with port and domain routing")
 	fmt.Println("            (docroid static serve, ps, start, stop, rm, files, export)")
 	fmt.Println("  rootfs    Manage lightweight Linux rootfs environments (list, pull, rm)")
@@ -1143,11 +1143,297 @@ func handleRootfs(store *app.Store, args []string) {
 	}
 }
 
+func printUIUsage() {
+	fmt.Println("Usage: docroid ui [command] [flags]")
+	fmt.Println()
+	fmt.Println("Launch or manage the built-in Docroid web dashboard.")
+	fmt.Println()
+	fmt.Println("Commands:")
+	fmt.Println("  start                     Launch the web dashboard (default)")
+	fmt.Println("  stop                      Stop the running web dashboard")
+	fmt.Println("  status                    Display dashboard running status, PID, and URLs")
+	fmt.Println("  logs                      Display background dashboard server logs")
+	fmt.Println("  restart                   Restart the background dashboard server")
+	fmt.Println()
+	fmt.Println("Flags:")
+	fmt.Println("  -p <port>                 Port for web dashboard (default: 9090)")
+	fmt.Println("  --host <ip>               Host interface to bind (default: 0.0.0.0)")
+	fmt.Println("  -d, --detach, -b          Run in background (detached mode)")
+	fmt.Println("  --stop                    Stop the running dashboard")
+	fmt.Println("  --status                  Show dashboard running status")
+	fmt.Println("  --logs                    View logs from background dashboard")
+	fmt.Println()
+	fmt.Println("Examples:")
+	fmt.Println("  docroid ui                    # Run in foreground")
+	fmt.Println("  docroid ui -d                 # Run in background (detached)")
+	fmt.Println("  docroid ui -d -p 8080         # Detached on port 8080")
+	fmt.Println("  docroid ui status             # Check if dashboard is running")
+	fmt.Println("  docroid ui logs               # View recent server logs")
+	fmt.Println("  docroid ui stop               # Stop detached dashboard")
+}
+
+func cleanStaleUIRecords(store *app.Store) {
+	_ = os.Remove(filepath.Join(store.BaseDir(), "ui.pid"))
+	_ = os.Remove(filepath.Join(store.BaseDir(), "ui.json"))
+}
+
+func isUIRunning(store *app.Store) (bool, int, int) {
+	pidPath := filepath.Join(store.BaseDir(), "ui.pid")
+	jsonPath := filepath.Join(store.BaseDir(), "ui.json")
+
+	data, err := os.ReadFile(pidPath)
+	if err != nil {
+		return false, 0, 0
+	}
+
+	pid, err := strconv.Atoi(strings.TrimSpace(string(data)))
+	if err != nil || pid <= 0 {
+		return false, 0, 0
+	}
+
+	proc, err := os.FindProcess(pid)
+	if err != nil {
+		return false, 0, 0
+	}
+
+	if err := proc.Signal(syscall.Signal(0)); err != nil {
+		// Process is dead
+		cleanStaleUIRecords(store)
+		return false, 0, 0
+	}
+
+	port := 9090
+	if jdata, err := os.ReadFile(jsonPath); err == nil {
+		var meta struct {
+			Port int `json:"port"`
+		}
+		if err := json.Unmarshal(jdata, &meta); err == nil && meta.Port > 0 {
+			port = meta.Port
+		}
+	}
+
+	return true, pid, port
+}
+
+func stopUIDaemon(store *app.Store) {
+	running, pid, _ := isUIRunning(store)
+	if !running || pid <= 0 {
+		fmt.Println("Docroid Web Dashboard is not running.")
+		cleanStaleUIRecords(store)
+		return
+	}
+
+	proc, err := os.FindProcess(pid)
+	if err == nil {
+		_ = proc.Signal(syscall.SIGTERM)
+		_ = syscall.Kill(-pid, syscall.SIGTERM)
+
+		stopped := false
+		for i := 0; i < 30; i++ {
+			time.Sleep(100 * time.Millisecond)
+			if err := proc.Signal(syscall.Signal(0)); err != nil {
+				stopped = true
+				break
+			}
+		}
+		if !stopped {
+			_ = proc.Kill()
+			_ = syscall.Kill(-pid, syscall.SIGKILL)
+		}
+	}
+
+	cleanStaleUIRecords(store)
+	fmt.Printf("✓ Stopped Docroid Web Dashboard (PID: %d)\n", pid)
+}
+
+func statusUIDaemon(store *app.Store) {
+	running, pid, port := isUIRunning(store)
+	if !running {
+		fmt.Println("Docroid Web Dashboard: STOPPED")
+		fmt.Println("Run 'docroid ui -d' to start the dashboard in the background.")
+		return
+	}
+
+	fmt.Printf("Docroid Web Dashboard: RUNNING\n")
+	fmt.Printf("==============================\n")
+	fmt.Printf("• PID:            %d\n", pid)
+	fmt.Printf("• Local access:   http://localhost:%d\n", port)
+	if ips := web.GetLocalIPs(); len(ips) > 0 {
+		for _, ip := range ips {
+			fmt.Printf("• Network access: http://%s:%d\n", ip, port)
+		}
+	}
+
+	jsonPath := filepath.Join(store.BaseDir(), "ui.json")
+	if jdata, err := os.ReadFile(jsonPath); err == nil {
+		var meta struct {
+			StartedAt string `json:"started_at"`
+		}
+		if err := json.Unmarshal(jdata, &meta); err == nil && meta.StartedAt != "" {
+			if t, err := time.Parse(time.RFC3339, meta.StartedAt); err == nil {
+				fmt.Printf("• Uptime:         %s (started %s)\n", time.Since(t).Round(time.Second), t.Format("2006-01-02 15:04:05"))
+			}
+		}
+	}
+
+	logPath := filepath.Join(store.BaseDir(), "logs", "ui.log")
+	if _, err := os.Stat(logPath); err == nil {
+		fmt.Printf("• Log file:       %s\n", logPath)
+	}
+	fmt.Println("\nRun 'docroid ui logs' to view logs, or 'docroid ui stop' to stop.")
+}
+
+func logsUIDaemon(store *app.Store) {
+	logPath := filepath.Join(store.BaseDir(), "logs", "ui.log")
+	data, err := os.ReadFile(logPath)
+	if err != nil {
+		fmt.Printf("No logs found at %s\n", logPath)
+		return
+	}
+
+	lines := strings.Split(string(data), "\n")
+	start := 0
+	if len(lines) > 50 {
+		start = len(lines) - 50
+	}
+	for _, l := range lines[start:] {
+		fmt.Println(l)
+	}
+}
+
+func startUIDetached(store *app.Store, host string, port int) {
+	if running, pid, curPort := isUIRunning(store); running {
+		fmt.Printf("Docroid Web Dashboard is already running (PID: %d, http://localhost:%d)\n", pid, curPort)
+		fmt.Println("Run 'docroid ui status' to check status, or 'docroid ui stop' to stop.")
+		return
+	}
+
+	if err := utils.CheckPortInUse(port); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: port %d is already in use by another application: %v\n", port, err)
+		os.Exit(1)
+	}
+
+	logDir := filepath.Join(store.BaseDir(), "logs")
+	_ = os.MkdirAll(logDir, 0755)
+	logPath := filepath.Join(logDir, "ui.log")
+
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating log file: %v\n", err)
+		os.Exit(1)
+	}
+
+	_, _ = fmt.Fprintf(logFile, "\n=== Docroid Web Dashboard starting at %s (host: %s, port: %d) ===\n", time.Now().Format(time.RFC3339), host, port)
+
+	selfPath, err := os.Executable()
+	if err != nil {
+		selfPath = os.Args[0]
+	}
+
+	cmd := exec.Command(selfPath, "ui", "--internal-daemon", "--host", host, "-p", strconv.Itoa(port))
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.Stdout = logFile
+	cmd.Stderr = logFile
+	cmd.Stdin = nil
+
+	if err := cmd.Start(); err != nil {
+		_ = logFile.Close()
+		fmt.Fprintf(os.Stderr, "Failed to start background UI server: %v\n", err)
+		os.Exit(1)
+	}
+
+	pid := cmd.Process.Pid
+	_ = logFile.Close()
+
+	// Wait up to 1 second to ensure server started and didn't immediately exit with error
+	started := true
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Millisecond)
+		if err := cmd.Process.Signal(syscall.Signal(0)); err != nil {
+			started = false
+			break
+		}
+	}
+
+	if !started {
+		fmt.Fprintf(os.Stderr, "Error: background UI process exited immediately. Check logs at %s\n", logPath)
+		logsUIDaemon(store)
+		os.Exit(1)
+	}
+
+	go func() {
+		_ = cmd.Process.Release()
+	}()
+
+	fmt.Println()
+	fmt.Printf("✓ Docroid Web Dashboard started in detached mode (PID: %d)\n", pid)
+	fmt.Printf("=========================================================\n")
+	fmt.Printf("• Local access:   http://localhost:%d\n", port)
+	if ips := web.GetLocalIPs(); len(ips) > 0 {
+		for _, ip := range ips {
+			fmt.Printf("• Network access: http://%s:%d\n", ip, port)
+		}
+	}
+	fmt.Printf("• Log file:       %s\n", logPath)
+	fmt.Println()
+	fmt.Println("Run 'docroid ui status' to check status, or 'docroid ui stop' to stop.")
+}
+
 func handleUI(manager *app.AppManager, store *app.Store, args []string) {
+	if len(args) > 0 {
+		switch args[0] {
+		case "help", "-h", "--help":
+			printUIUsage()
+			return
+		case "stop":
+			stopUIDaemon(store)
+			return
+		case "status":
+			statusUIDaemon(store)
+			return
+		case "logs":
+			logsUIDaemon(store)
+			return
+		case "restart":
+			stopUIDaemon(store)
+			time.Sleep(500 * time.Millisecond)
+			startUIDetached(store, "0.0.0.0", 9090)
+			return
+		case "start":
+			args = args[1:]
+		}
+	}
+
 	fs := flag.NewFlagSet("ui", flag.ExitOnError)
 	port := fs.Int("p", 9090, "Port for web dashboard")
 	host := fs.String("host", "0.0.0.0", "Host interface to bind")
+	detach := fs.Bool("d", false, "Run in background (detached mode)")
+	fs.BoolVar(detach, "detach", false, "Run in background (detached mode)")
+	fs.BoolVar(detach, "b", false, "Run in background (detached mode)")
+	fs.BoolVar(detach, "background", false, "Run in background (detached mode)")
+	stopFlag := fs.Bool("stop", false, "Stop running detached web dashboard")
+	statusFlag := fs.Bool("status", false, "Check status of web dashboard")
+	logsFlag := fs.Bool("logs", false, "View logs of detached web dashboard")
+	isDaemon := fs.Bool("internal-daemon", false, "Internal flag for daemon child process")
 	_ = fs.Parse(args)
+
+	if *stopFlag {
+		stopUIDaemon(store)
+		return
+	}
+	if *statusFlag {
+		statusUIDaemon(store)
+		return
+	}
+	if *logsFlag {
+		logsUIDaemon(store)
+		return
+	}
+
+	if *detach && !*isDaemon {
+		startUIDetached(store, *host, *port)
+		return
+	}
 
 	rootfsMgr := rootfs.NewManager(store)
 	if err := web.StartServer(manager, rootfsMgr, *host, *port); err != nil {

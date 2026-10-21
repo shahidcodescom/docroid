@@ -110,3 +110,102 @@ func TestNativeEngineExecRun(t *testing.T) {
 		t.Errorf("expected stdout 'base_val-override_val', got '%s'", out)
 	}
 }
+
+func TestRootfsEnginePrepare(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "docroid_rootfs_test_*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	store, err := app.NewStore(tempDir)
+	if err != nil {
+		t.Fatalf("failed to create store: %v", err)
+	}
+
+	// Create simulated alpine rootfs directory
+	alpineDir := store.RootfsDir("alpine")
+	if err := os.MkdirAll(alpineDir, 0755); err != nil {
+		t.Fatalf("failed to create rootfs dir: %v", err)
+	}
+
+	testApp := &app.App{
+		ID:      "test-rootfs-1",
+		Name:    "test-rootfs",
+		Engine:  app.EngineRootfs,
+		Rootfs:  "alpine",
+		Command: "/bin/sh",
+		Args:    []string{"-c", "echo hello"},
+		Port:    8080,
+		Env: map[string]string{
+			"MY_CUSTOM_VAR": "custom_val",
+		},
+		Status: app.StatusRunning,
+	}
+
+	eng := &RootfsEngine{prootPath: "/data/data/com.termux/files/usr/bin/proot"}
+
+	cfg := &RunConfig{
+		App:         testApp,
+		Store:       store,
+		Interactive: false,
+		User:        "appuser",
+	}
+
+	// Temporarily set LD_PRELOAD in environment to test that it is excluded
+	os.Setenv("LD_PRELOAD", "/data/data/com.termux/files/usr/lib/libtermux-exec.so")
+	defer os.Unsetenv("LD_PRELOAD")
+
+	cmd, err := eng.Prepare(cfg)
+	if err != nil {
+		t.Fatalf("Prepare failed: %v", err)
+	}
+
+	// 1. Verify prootArgs NEVER contains unknown "-E" flag
+	for i, arg := range cmd.Args {
+		if arg == "-E" {
+			t.Fatalf("found invalid proot argument '-E' at index %d", i)
+		}
+	}
+
+	// 2. Verify prootArgs contains --link2symlink when Termux proot is used
+	hasLink2Symlink := false
+	for _, arg := range cmd.Args {
+		if arg == "--link2symlink" {
+			hasLink2Symlink = true
+			break
+		}
+	}
+	if !hasLink2Symlink {
+		t.Errorf("expected '--link2symlink' in proot args for Termux proot")
+	}
+
+	// 3. Verify environment variables in cmd.Env
+	envMap := make(map[string]string)
+	for _, env := range cmd.Env {
+		parts := strings.SplitN(env, "=", 2)
+		if len(parts) == 2 {
+			envMap[parts[0]] = parts[1]
+		}
+	}
+
+	if envMap["PORT"] != "8080" {
+		t.Errorf("expected PORT=8080 in cmd.Env, got: %s", envMap["PORT"])
+	}
+	if envMap["MY_CUSTOM_VAR"] != "custom_val" {
+		t.Errorf("expected MY_CUSTOM_VAR=custom_val in cmd.Env, got: %s", envMap["MY_CUSTOM_VAR"])
+	}
+	if envMap["USER"] != "appuser" {
+		t.Errorf("expected USER=appuser in cmd.Env, got: %s", envMap["USER"])
+	}
+	if envMap["HOME"] != "/home/appuser" {
+		t.Errorf("expected HOME=/home/appuser in cmd.Env, got: %s", envMap["HOME"])
+	}
+	if envMap["PATH"] != "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" {
+		t.Errorf("expected rootfs PATH in cmd.Env, got: %s", envMap["PATH"])
+	}
+	if _, hasLD := envMap["LD_PRELOAD"]; hasLD {
+		t.Errorf("LD_PRELOAD should have been filtered out of cmd.Env")
+	}
+}
+

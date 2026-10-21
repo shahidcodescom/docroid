@@ -462,7 +462,31 @@ func TestStaticSitesAPI(t *testing.T) {
 		t.Fatalf("expected 200 for export, got %d", recExport.Code)
 	}
 
-	// 6. Delete site
+	// 6. Start site via API
+	reqStart := httptest.NewRequest(http.MethodPost, "/api/sites/"+siteID+"/start", nil)
+	recStart := httptest.NewRecorder()
+	server.mux.ServeHTTP(recStart, reqStart)
+	if recStart.Code != http.StatusOK {
+		t.Fatalf("expected 200 for start, got %d (%s)", recStart.Code, recStart.Body.String())
+	}
+
+	// 7. Stop site via API (MUST NOT kill process / must succeed)
+	reqStop := httptest.NewRequest(http.MethodPost, "/api/sites/"+siteID+"/stop", nil)
+	recStop := httptest.NewRecorder()
+	server.mux.ServeHTTP(recStop, reqStop)
+	if recStop.Code != http.StatusOK {
+		t.Fatalf("expected 200 for stop, got %d (%s)", recStop.Code, recStop.Body.String())
+	}
+
+	var stoppedSite map[string]interface{}
+	if err := json.Unmarshal(recStop.Body.Bytes(), &stoppedSite); err != nil {
+		t.Fatalf("failed to decode stop response: %v", err)
+	}
+	if stoppedSite["status"] != "stopped" {
+		t.Errorf("expected status 'stopped', got '%v'", stoppedSite["status"])
+	}
+
+	// 8. Delete site
 	reqDel := httptest.NewRequest(http.MethodDelete, "/api/sites/"+siteID, nil)
 	recDel := httptest.NewRecorder()
 	server.mux.ServeHTTP(recDel, reqDel)
