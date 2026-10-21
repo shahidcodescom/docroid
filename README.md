@@ -604,18 +604,33 @@ Inside `web`, you can seamlessly connect to PostgreSQL via `postgres://postgres:
 Docroid includes a built-in, zero-dependency web dashboard embedded directly into the binary:
 
 ```bash
-# Launch dashboard on default port 9090
+# Launch dashboard in foreground (default port 9090)
 docroid ui
 
-# Or specify custom port
-docroid ui -p 9090
+# Launch dashboard in background (detached mode)
+docroid ui -d
+# or with custom port:
+docroid ui -d -p 9090
+
+# Check running status, PID, uptime, and URLs
+docroid ui status
+
+# View background dashboard logs
+docroid ui logs
+
+# Restart background dashboard
+docroid ui restart
+
+# Stop detached dashboard server
+docroid ui stop
 ```
 
 ```
-Docroid Web Dashboard & Management Server
-==========================================
+✓ Docroid Web Dashboard started in detached mode (PID: 46286)
+=========================================================
 • Local access:   http://localhost:9090
 • Network access: http://192.168.1.50:9090
+• Log file:       ~/.docroid/logs/ui.log
 ```
 
 ### Features:
@@ -987,7 +1002,7 @@ docroid deployment rm web-api
 
 | Command | Subcommand / Flags | Description |
 |---------|--------------------|-------------|
-| `docroid ui` | `-p <port>`, `--host <ip>` | Launch built-in web dashboard (default :9090) |
+| `docroid ui` | `-d`, `-p <port>`, `--host <ip>`, `stop`, `status`, `logs`, `restart` | Launch built-in web dashboard (foreground or detached background daemon) |
 | `docroid cluster` | `init`, `join`, `status`, `leave` | Manage multi-device cluster mesh, tokens, and roles |
 | `docroid node` | `ls`, `inspect <id>`, `rm <id>` | Inspect or manage interconnected device nodes |
 | `docroid pod` | `run`, `ls`, `logs <id>`, `rm <id>` | Deploy, inspect, or manage atomic cluster pods |
