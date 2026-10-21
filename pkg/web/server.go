@@ -178,6 +178,7 @@ func (s *Server) handleApps(w http.ResponseWriter, r *http.Request) {
 			Name          string            `json:"name"`
 			Engine        string            `json:"engine"`
 			Command       string            `json:"command"`
+			Image         string            `json:"image"`
 			Args          []string          `json:"args"`
 			Port          int               `json:"port"`
 			PortMapping   string            `json:"port_mapping"`
@@ -196,8 +197,16 @@ func (s *Server) handleApps(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if req.Command == "" && req.Engine != string(app.EngineRootfs) {
-			http.Error(w, `{"error":"command is required"}`, http.StatusBadRequest)
+		// Detect if an image was requested (either via req.Image, or if req.Command is an image reference)
+		imageRef := req.Image
+		if imageRef == "" && (strings.Contains(req.Command, "/") || strings.Contains(req.Command, ":")) {
+			if _, pathErr := exec.LookPath(req.Command); pathErr != nil && !filepath.IsAbs(req.Command) && !strings.HasPrefix(req.Command, "./") {
+				imageRef = req.Command
+			}
+		}
+
+		if imageRef == "" && req.Command == "" && req.Engine != string(app.EngineRootfs) {
+			http.Error(w, `{"error":"command or image is required"}`, http.StatusBadRequest)
 			return
 		}
 
@@ -232,21 +241,71 @@ func (s *Server) handleApps(w http.ResponseWriter, r *http.Request) {
 			restartPolicy = req.RestartPolicy
 		}
 
-		createdApp, err := s.manager.CreateApp(
-			req.Name,
-			engType,
-			req.Command,
-			req.Args,
-			req.Env,
-			req.WorkDir,
-			targetPort,
-			req.Volumes,
-			req.Rootfs,
-			restartPolicy,
-		)
-		if err != nil {
-			http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusBadRequest)
-			return
+		var createdApp *app.App
+		if imageRef != "" {
+			// Auto-pull image if missing locally
+			img, _ := bundle.GetImage(s.manager.Store(), imageRef)
+			if img == nil {
+				var pullBuf strings.Builder
+				if _, pErr := bundle.PullImage(s.manager.Store(), imageRef, &pullBuf); pErr != nil {
+					http.Error(w, fmt.Sprintf(`{"error":"failed to pull image %s: %s"}`, imageRef, pErr.Error()), http.StatusBadRequest)
+					return
+				}
+				img, _ = bundle.GetImage(s.manager.Store(), imageRef)
+			}
+			if img != nil {
+				deployed, err := bundle.DeployFromImage(s.manager.Store(), s.manager, imageRef, req.Name, req.Detached)
+				if err != nil {
+					http.Error(w, fmt.Sprintf(`{"error":"failed to deploy from image %s: %s"}`, imageRef, err.Error()), http.StatusBadRequest)
+					return
+				}
+				createdApp = deployed
+				engType = createdApp.Engine
+				if len(req.Args) > 0 {
+					createdApp.Args = req.Args
+				}
+				if req.WorkDir != "" {
+					createdApp.WorkDir = req.WorkDir
+				}
+				if targetPort > 0 {
+					createdApp.Port = targetPort
+				}
+				if req.Env != nil {
+					if createdApp.Env == nil {
+						createdApp.Env = make(map[string]string)
+					}
+					for k, v := range req.Env {
+						createdApp.Env[k] = v
+					}
+				}
+				if len(req.Volumes) > 0 {
+					createdApp.Volumes = append(createdApp.Volumes, req.Volumes...)
+				}
+				if restartPolicy != "no" {
+					createdApp.RestartPolicy = restartPolicy
+				}
+				_ = s.manager.Store().SaveApp(createdApp)
+			}
+		}
+
+		if createdApp == nil {
+			var err error
+			createdApp, err = s.manager.CreateApp(
+				req.Name,
+				engType,
+				req.Command,
+				req.Args,
+				req.Env,
+				req.WorkDir,
+				targetPort,
+				req.Volumes,
+				req.Rootfs,
+				restartPolicy,
+			)
+			if err != nil {
+				http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusBadRequest)
+				return
+			}
 		}
 
 		if pMap != nil {

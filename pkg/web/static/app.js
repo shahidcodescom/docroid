@@ -1123,6 +1123,7 @@ async function handleDeploySubmit(e) {
   const name = document.getElementById('appName').value.trim();
   const engine = document.getElementById('appEngine').value;
   const rootfs = document.getElementById('appRootfs').value;
+  const image = document.getElementById('appImage') ? document.getElementById('appImage').value.trim() : '';
   const command = document.getElementById('appCommand').value.trim();
   const rawArgs = document.getElementById('appArgs').value.trim();
   const portMapping = document.getElementById('appPort').value.trim();
@@ -1131,6 +1132,13 @@ async function handleDeploySubmit(e) {
   const workDir = document.getElementById('appWorkDir').value.trim();
   const rawEnv = document.getElementById('appEnv').value.trim();
   const detached = document.getElementById('appDetached').checked;
+
+  if (!command && !image && engine !== 'rootfs') {
+    showToast('Please specify a command or Docker image', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Launch App';
+    return;
+  }
 
   const args = rawArgs ? rawArgs.split(' ').filter(Boolean) : [];
   const envMap = {};
@@ -1160,6 +1168,7 @@ async function handleDeploySubmit(e) {
 
   const payload = {
     name,
+    image,
     engine,
     command,
     args,
@@ -1311,8 +1320,15 @@ function deployFromImagePrompt(ref) {
   const deployModal = document.getElementById('deployModal');
   if (deployModal) {
     deployModal.classList.add('active');
+    const imgInput = document.getElementById('appImage');
+    if (imgInput) imgInput.value = ref;
     const cmdInput = document.getElementById('appCommand');
-    if (cmdInput) cmdInput.value = ref;
+    if (cmdInput) cmdInput.value = '';
+    const engineSelect = document.getElementById('appEngine');
+    if (engineSelect) {
+      engineSelect.value = 'rootfs';
+      engineSelect.dispatchEvent(new Event('change'));
+    }
     const nameInput = document.getElementById('appName');
     if (nameInput && !nameInput.value) {
       const cleanName = ref.split(':')[0].split('/').pop();

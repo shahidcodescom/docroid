@@ -709,6 +709,19 @@ func extractLayer(r io.Reader, destDir string) error {
 			_ = os.Remove(target)
 			_ = os.MkdirAll(filepath.Dir(target), 0755)
 			_ = os.Symlink(header.Linkname, target)
+		case tar.TypeLink:
+			_ = os.Remove(target)
+			_ = os.MkdirAll(filepath.Dir(target), 0755)
+			linkTarget := filepath.Join(destDir, header.Linkname)
+			if err := os.Link(linkTarget, target); err != nil {
+				// Fallback to relative or direct symlink if hardlinks fail on Android storage
+				rel, relErr := filepath.Rel(filepath.Dir(target), linkTarget)
+				if relErr == nil {
+					_ = os.Symlink(rel, target)
+				} else {
+					_ = os.Symlink(header.Linkname, target)
+				}
+			}
 		}
 	}
 	return nil

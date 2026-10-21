@@ -42,6 +42,7 @@ type App struct {
 	PortMapping   string            `json:"port_mapping,omitempty"`
 	Volumes       []VolumeMount     `json:"volumes,omitempty"`
 	Rootfs        string            `json:"rootfs,omitempty"`
+	Image         string            `json:"image,omitempty"`
 	RestartPolicy string            `json:"restart_policy,omitempty"` // "no", "always", "on-failure"
 	RestartCount  int               `json:"restart_count,omitempty"`
 	Network       string            `json:"network,omitempty"`         // e.g. "bridge", "my-net"

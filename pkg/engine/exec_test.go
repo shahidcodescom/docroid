@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -208,4 +209,105 @@ func TestRootfsEnginePrepare(t *testing.T) {
 		t.Errorf("LD_PRELOAD should have been filtered out of cmd.Env")
 	}
 }
+
+func TestRootfsEngineDockerImageResolution(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "docroid_docker_test_*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	store, err := app.NewStore(tempDir)
+	if err != nil {
+		t.Fatalf("failed to create store: %v", err)
+	}
+
+	// Create simulated pulled image ~/.docroid/images/bkimminich/juice-shop:latest
+	imageDir := filepath.Join(store.BaseDir(), "images", "bkimminich", "juice-shop:latest")
+	payloadDir := filepath.Join(imageDir, "payload")
+	if err := os.MkdirAll(filepath.Join(payloadDir, "bin"), 0755); err != nil {
+		t.Fatalf("failed to create payload bin: %v", err)
+	}
+	if err := os.MkdirAll(filepath.Join(payloadDir, "etc"), 0755); err != nil {
+		t.Fatalf("failed to create payload etc: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(payloadDir, "bin", "sh"), []byte("#!/bin/sh\n"), 0755); err != nil {
+		t.Fatalf("failed to create dummy sh: %v", err)
+	}
+
+	manifestJSON := []byte(`{
+		"format_version": "1.0",
+		"name": "bkimminich/juice-shop",
+		"version": "latest",
+		"engine": "rootfs",
+		"command": "/nodejs/bin/node",
+		"args": ["/juice-shop/build/app.js"],
+		"port": 3000,
+		"env": {
+			"PATH": "/nodejs/bin:/usr/local/bin:/usr/bin",
+			"NODE_ENV": "production"
+		},
+		"work_dir": "/juice-shop"
+	}`)
+	if err := os.WriteFile(filepath.Join(imageDir, "manifest.json"), manifestJSON, 0644); err != nil {
+		t.Fatalf("failed to write manifest: %v", err)
+	}
+
+	testApp := &app.App{
+		ID:      "test-app-juice",
+		Name:    "juice-shop",
+		Engine:  app.EngineRootfs,
+		Command: "bkimminich/juice-shop:latest",
+		Status:  app.StatusRunning,
+	}
+
+	eng := &RootfsEngine{prootPath: "/data/data/com.termux/files/usr/bin/proot"}
+	cfg := &RunConfig{
+		App:         testApp,
+		Store:       store,
+		Interactive: false,
+	}
+
+	cmd, err := eng.Prepare(cfg)
+	if err != nil {
+		t.Fatalf("Prepare failed: %v", err)
+	}
+
+	// Verify command inside rootfs is the resolved node binary, NOT the docker image tag string
+	cmdArgsStr := strings.Join(cmd.Args, " ")
+	if strings.Contains(cmdArgsStr, "bkimminich/juice-shop:latest") {
+		t.Errorf("cmd.Args should not contain image tag as binary: %v", cmd.Args)
+	}
+	if !strings.Contains(cmdArgsStr, "/nodejs/bin/node") {
+		t.Errorf("cmd.Args should execute /nodejs/bin/node, got: %v", cmd.Args)
+	}
+	if !strings.Contains(cmdArgsStr, "/juice-shop/build/app.js") {
+		t.Errorf("cmd.Args should pass /juice-shop/build/app.js, got: %v", cmd.Args)
+	}
+
+	// Verify -w was set to image work_dir "/juice-shop"
+	hasWorkDir := false
+	for i, arg := range cmd.Args {
+		if arg == "-w" && i+1 < len(cmd.Args) && cmd.Args[i+1] == "/juice-shop" {
+			hasWorkDir = true
+			break
+		}
+	}
+	if !hasWorkDir {
+		t.Errorf("expected -w /juice-shop in proot args, got: %v", cmd.Args)
+	}
+
+	// Verify cmd.Env has the image PATH and environment
+	hasNodePath := false
+	for _, env := range cmd.Env {
+		if env == "PATH=/nodejs/bin:/usr/local/bin:/usr/bin" {
+			hasNodePath = true
+			break
+		}
+	}
+	if !hasNodePath {
+		t.Errorf("expected image PATH in cmd.Env, got: %v", cmd.Env)
+	}
+}
+
 

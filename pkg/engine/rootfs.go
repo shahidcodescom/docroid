@@ -9,7 +9,9 @@ import (
 	"strings"
 
 	"docroid/pkg/app"
+	"docroid/pkg/bundle"
 	"docroid/pkg/network"
+	"docroid/pkg/utils"
 )
 
 type RootfsEngine struct {
@@ -39,14 +41,83 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 	}
 
 	a := cfg.App
-	rootfsName := a.Rootfs
-	if rootfsName == "" {
-		rootfsName = "alpine"
+	wsDir := cfg.Store.WorkspaceDir(a.ID)
+	_ = os.MkdirAll(wsDir, 0755)
+
+	// Check if a.Command is an image reference (e.g. "bkimminich/juice-shop:latest")
+	if img, err := bundle.GetImage(cfg.Store, a.Command); err == nil && img != nil {
+		if a.Image == "" {
+			a.Image = a.Command
+		}
+		if img.Command != "" && img.Command != a.Command {
+			a.Command = img.Command
+			if len(a.Args) == 0 {
+				a.Args = img.Args
+			}
+		} else {
+			a.Command = "/bin/sh"
+		}
+		if a.WorkDir == "" && img.WorkDir != "" {
+			a.WorkDir = img.WorkDir
+		}
+		if a.Port == 0 && img.Port > 0 {
+			a.Port = img.Port
+		}
+		if a.Env == nil {
+			a.Env = make(map[string]string)
+		}
+		for k, v := range img.Env {
+			if _, exists := a.Env[k]; !exists {
+				a.Env[k] = v
+			}
+		}
 	}
 
-	rootfsDir := cfg.Store.RootfsDir(rootfsName)
-	if _, err := os.Stat(rootfsDir); os.IsNotExist(err) {
-		return nil, fmt.Errorf("rootfs '%s' is not installed. Run 'docroid rootfs pull %s' first", rootfsName, rootfsName)
+	// If app was deployed from an image, ensure workspace has the image payload unpacked
+	if a.Image != "" {
+		if img, err := bundle.GetImage(cfg.Store, a.Image); err == nil && img != nil {
+			imageDir := filepath.Join(cfg.Store.BaseDir(), "images", img.TaggedName())
+			if _, err := os.Stat(imageDir); os.IsNotExist(err) {
+				imageDir = filepath.Join(cfg.Store.BaseDir(), "images", a.Image)
+			}
+			payloadDir := filepath.Join(imageDir, "payload")
+			// If wsDir doesn't have rootfs binaries yet, copy payload
+			if _, err := os.Stat(filepath.Join(wsDir, "bin")); os.IsNotExist(err) {
+				if _, err := os.Stat(payloadDir); err == nil {
+					_ = utils.CopyRecursive(payloadDir, wsDir)
+				}
+			}
+		}
+	}
+
+	// Determine rootfs directory:
+	// If workspace itself contains a rootfs (e.g. Docker container image rootfs with /bin, /etc, or /bin/sh),
+	// use wsDir as the container rootfs directly!
+	var rootfsDir string
+	isWorkspaceRootfs := false
+	if _, err := os.Stat(filepath.Join(wsDir, "bin")); err == nil {
+		if _, err := os.Stat(filepath.Join(wsDir, "etc")); err == nil {
+			isWorkspaceRootfs = true
+		}
+	}
+	if !isWorkspaceRootfs {
+		if _, err := os.Stat(filepath.Join(wsDir, "bin", "sh")); err == nil {
+			isWorkspaceRootfs = true
+		}
+	}
+
+	if isWorkspaceRootfs {
+		rootfsDir = wsDir
+		_ = os.MkdirAll(filepath.Join(wsDir, "workspace"), 0755)
+	} else {
+		rootfsName := a.Rootfs
+		if rootfsName == "" {
+			rootfsName = "alpine"
+		}
+		rootfsDir = cfg.Store.RootfsDir(rootfsName)
+		if _, err := os.Stat(rootfsDir); os.IsNotExist(err) {
+			return nil, fmt.Errorf("rootfs '%s' is not installed. Run 'docroid rootfs pull %s' first", rootfsName, rootfsName)
+		}
 	}
 
 	// Build proot command arguments
@@ -80,10 +151,10 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 		prootArgs = append(prootArgs, "-b", termuxTmp+":/tmp")
 	}
 
-	// Bind isolated workspace
-	wsDir := cfg.Store.WorkspaceDir(a.ID)
-	_ = os.MkdirAll(wsDir, 0755)
-	prootArgs = append(prootArgs, "-b", fmt.Sprintf("%s:/workspace", wsDir))
+	// Bind isolated workspace (only if rootfs is external e.g. alpine)
+	if !isWorkspaceRootfs {
+		prootArgs = append(prootArgs, "-b", fmt.Sprintf("%s:/workspace", wsDir))
+	}
 
 	// Bind custom volumes
 	for _, v := range a.Volumes {
@@ -102,7 +173,11 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 	// Working directory inside container
 	workDir := a.WorkDir
 	if workDir == "" {
-		workDir = "/workspace"
+		if isWorkspaceRootfs {
+			workDir = "/"
+		} else {
+			workDir = "/workspace"
+		}
 	}
 	prootArgs = append(prootArgs, "-w", workDir)
 
@@ -155,11 +230,10 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 
 	cmd := exec.Command(e.prootPath, prootArgs...)
 
-	// Construct clean environment for proot and the guest container process.
-	// Inherit safe host environment variables (like TERM, LANG, etc.),
-	// but filter out LD_PRELOAD, LD_LIBRARY_PATH, and host paths (PATH, HOME, USER, LOGNAME)
-	// so Termux libraries and host configurations don't interfere with rootfs binaries.
-	var cmdEnv []string
+	// Construct clean, deduplicated environment map for proot and the guest container process
+	mergedEnv := make(map[string]string)
+
+	// 1. Inherit safe host environment variables (excluding LD_*, PATH, HOME, USER, LOGNAME, TMPDIR)
 	for _, envEntry := range os.Environ() {
 		parts := strings.SplitN(envEntry, "=", 2)
 		if len(parts) == 2 {
@@ -167,27 +241,28 @@ func (e *RootfsEngine) Prepare(cfg *RunConfig) (*exec.Cmd, error) {
 			if strings.HasPrefix(k, "LD_") || k == "PATH" || k == "HOME" || k == "USER" || k == "LOGNAME" || k == "TMPDIR" {
 				continue
 			}
-			if _, exists := defaultEnvs[k]; exists {
-				continue
-			}
-			if _, exists := a.Env[k]; exists {
-				continue
-			}
-			cmdEnv = append(cmdEnv, envEntry)
+			mergedEnv[k] = parts[1]
 		}
 	}
 
+	// 2. Default container environment
 	for k, v := range defaultEnvs {
-		cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", k, v))
+		mergedEnv[k] = v
 	}
+
+	// 3. User / Image environment overrides (including container PATH)
 	for k, v := range a.Env {
-		cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", k, v))
+		mergedEnv[k] = v
 	}
 
 	if termuxTmpExists {
-		cmdEnv = append(cmdEnv, fmt.Sprintf("PROOT_TMP_DIR=%s", termuxTmp))
+		mergedEnv["PROOT_TMP_DIR"] = termuxTmp
 	}
 
+	var cmdEnv []string
+	for k, v := range mergedEnv {
+		cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", k, v))
+	}
 	cmd.Env = cmdEnv
 
 	// Configure process group attributes for clean signal handling in background/detached mode.

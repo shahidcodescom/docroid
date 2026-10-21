@@ -290,20 +290,34 @@ func DeployFromImage(store *app.Store, manager *app.AppManager, imageTag string,
 
 	actualTag := manifest.TaggedName()
 	imageDir := filepath.Join(store.BaseDir(), "images", actualTag)
+	if _, err := os.Stat(imageDir); os.IsNotExist(err) {
+		imageDir = filepath.Join(store.BaseDir(), "images", imageTag)
+	}
 
 	appName := customName
 	if appName == "" {
 		appName = manifest.Name
+		if strings.Contains(appName, "/") {
+			appName = filepath.Base(appName)
+		}
 	}
+
+	cmd := manifest.Command
+	args := manifest.Args
+	if cmd == "" {
+		cmd = "/bin/sh"
+	}
+
+	workDir := manifest.WorkDir
 
 	// Create app record
 	application, err := manager.CreateApp(
 		appName,
 		manifest.Engine,
-		manifest.Command,
-		manifest.Args,
+		cmd,
+		args,
 		manifest.Env,
-		"",
+		workDir,
 		manifest.Port,
 		nil,
 		manifest.Rootfs,
@@ -312,15 +326,17 @@ func DeployFromImage(store *app.Store, manager *app.AppManager, imageTag string,
 	if err != nil {
 		return nil, err
 	}
+	application.Image = imageTag
 
 	// Copy payload contents into the app's isolated workspace
 	payloadDir := filepath.Join(imageDir, "payload")
 	wsDir := store.WorkspaceDir(application.ID)
 	if _, err := os.Stat(payloadDir); err == nil {
-		if err := copyRecursive(payloadDir, wsDir); err != nil {
+		if err := utils.CopyRecursive(payloadDir, wsDir); err != nil {
 			return nil, fmt.Errorf("failed to copy image payload to workspace: %w", err)
 		}
 	}
 
+	_ = store.SaveApp(application)
 	return application, nil
 }

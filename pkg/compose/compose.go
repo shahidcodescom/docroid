@@ -334,7 +334,14 @@ func Up(ctx context.Context, store *app.Store, manager *app.AppManager, cfg *Com
 
 		// Check if target is an installed image
 		if resolved.Image != "" {
-			if img, _ := bundle.GetImage(store, resolved.Image); img != nil {
+			img, _ := bundle.GetImage(store, resolved.Image)
+			if img == nil && (strings.Contains(resolved.Image, "/") || strings.Contains(resolved.Image, ":")) {
+				fmt.Printf("Pulling compose image '%s'...\n", resolved.Image)
+				if _, pErr := bundle.PullImage(store, resolved.Image, os.Stdout); pErr == nil {
+					img, _ = bundle.GetImage(store, resolved.Image)
+				}
+			}
+			if img != nil {
 				deployed, err := bundle.DeployFromImage(store, manager, resolved.Image, resolved.Name, detach)
 				if err != nil {
 					return launched, fmt.Errorf("failed to deploy service %s from image %s: %w", serviceKey, resolved.Image, err)
@@ -346,6 +353,21 @@ func Up(ctx context.Context, store *app.Store, manager *app.AppManager, cfg *Com
 					}
 					_ = store.SaveApp(deployed)
 				}
+				if len(resolved.Args) > 0 {
+					deployed.Args = resolved.Args
+				}
+				if len(resolved.Environment) > 0 {
+					if deployed.Env == nil {
+						deployed.Env = make(map[string]string)
+					}
+					for k, v := range resolved.Environment {
+						deployed.Env[k] = v
+					}
+				}
+				if resolved.WorkingDir != "" {
+					deployed.WorkDir = resolved.WorkingDir
+				}
+				_ = store.SaveApp(deployed)
 				launched = append(launched, deployed)
 				continue
 			}

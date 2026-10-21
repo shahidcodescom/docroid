@@ -357,6 +357,9 @@ func handleRun(manager *app.AppManager, args []string) {
 			fmt.Printf("Unable to find image '%s' locally. Pulling...\n", command)
 			if _, pErr := bundle.PullImage(manager.Store(), command, os.Stdout); pErr == nil {
 				img, _ = bundle.GetImage(manager.Store(), command)
+			} else {
+				fmt.Fprintf(os.Stderr, "Error: failed to pull image '%s': %v\n", command, pErr)
+				os.Exit(1)
 			}
 		}
 	}
